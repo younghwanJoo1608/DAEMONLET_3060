@@ -12,6 +12,7 @@ export class DotBridgeServer{
  private server:Server|null=null
  private pending=0
  private lastCall=0
+ private lastStatus=0
  constructor(private service:DotPresentationService){}
  async start(config:{token:string;port:number}){
   if(this.server)throw Error('DOT_ALREADY_STARTED')
@@ -25,8 +26,9 @@ export class DotBridgeServer{
    ++this.pending
    try{
     let bytes=0;const chunks:Buffer[]=[]
-    for await(const chunk of req){bytes+=chunk.length;if(bytes>8192){reply(413,{error:'DOT_SIZE'});return}chunks.push(Buffer.from(chunk))}
+    for await(const chunk of req){bytes+=chunk.length;if(bytes>96*1024){reply(413,{error:'DOT_SIZE'});return}chunks.push(Buffer.from(chunk))}
     let value:unknown;try{value=JSON.parse(Buffer.concat(chunks).toString('utf8'))}catch{reply(400,{error:'DOT_ARGUMENTS'});return}
+    if((value as any)?.type==='status'){if(Object.keys(value as object).length!==1)throw Error('DOT_ARGUMENTS');if(Date.now()-this.lastStatus<250){reply(429,{error:'DOT_RATE_LIMIT'});return}this.lastStatus=Date.now();reply(200,this.service.status());return}
     if((value as any)?.type!=='cancel'&&Date.now()-this.lastCall<250){reply(429,{error:'DOT_RATE_LIMIT'});return}
     if((value as any)?.type!=='cancel')this.lastCall=Date.now()
     reply(200,await this.service.present(value))

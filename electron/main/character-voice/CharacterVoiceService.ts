@@ -1,3 +1,4 @@
+import {DOT_FULL_TEXT_LIMIT} from '../../shared/dot-presentation'
 import {defaultVoiceSetup,voiceSetupPaths,currentVoiceSetupPath,isLegacyVoiceModel,type VoiceSetupPathId} from '../../shared/voice-setup-paths'
 import type {WindowsGgufModelInstallation} from './WindowsGgufModelInstaller'
 import type {WindowsGgufRuntimeInstallation} from './WindowsGgufRuntimeInstaller'
@@ -647,7 +648,7 @@ export class CharacterVoiceService {
   if(signal.aborted)throw Error('VOICE_CANCELLED')
   if(!this.outputReady)throw Error('VOICE_OUTPUT_NOT_READY')
   if(this.presentationMuted||!s.enabled||!s.runtimeConfigured||!character||s.seedError||!s.availableProfiles?.length)throw Error('VOICE_PRESENTATION_UNAVAILABLE')
-  if(typeof text!=='string'||!text.trim()||[...text].length>600)throw Error('VOICE_MESSAGE')
+  if(typeof text!=='string'||!text.trim()||text.length>DOT_FULL_TEXT_LIMIT)throw Error('VOICE_MESSAGE')
   let operation=this.operation
   const id=randomUUID(),abort=()=>{if(operation===this.operation&&this.speechOwner==='presentation')void this.stop(true,false).catch(e=>this.error(e))}
   signal.addEventListener('abort',abort,{once:true})

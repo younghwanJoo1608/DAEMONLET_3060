@@ -2,12 +2,12 @@ import {afterEach,expect,it,vi} from 'vitest'
 import {PassThrough} from 'node:stream'
 import {createMcpHandler,runStdio,localForward,tools} from '../scripts/dot-presentation-mcp.mjs'
 async function ready(forward:any=vi.fn(async()=>({accepted:true}))){const handler=createMcpHandler(forward);await handler({jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:'2025-06-18'}});await handler({jsonrpc:'2.0',method:'notifications/initialized'});return {handler,forward}}
-it('negotiates stdio tools and declares all writes without resources/history',async()=>{const {handler}=await ready();const r:any=await handler({jsonrpc:'2.0',id:2,method:'tools/list'});expect(r.result.tools.map((t:any)=>t.name)).toEqual(['present','cancel']);expect(tools.every(t=>!t.annotations.readOnlyHint&&!t.annotations.openWorldHint)).toBe(true);expect(await handler({jsonrpc:'2.0',id:3,method:'resources/list'})).toMatchObject({error:{code:-32601}})})
+it('negotiates stdio tools and declares all writes without resources/history',async()=>{const {handler}=await ready();const r:any=await handler({jsonrpc:'2.0',id:2,method:'tools/list'});expect(r.result.tools.map((t:any)=>t.name)).toEqual(['present','cancel','status']);expect(tools.every(t=>t.annotations.readOnlyHint===(t.name==='status')&&!t.annotations.openWorldHint)).toBe(true);expect(await handler({jsonrpc:'2.0',id:3,method:'resources/list'})).toMatchObject({error:{code:-32601}})})
 it('requires initialize and returns tool errors without leaking private exception strings',async()=>{const h=createMcpHandler(async()=>{});expect(await h({jsonrpc:'2.0',id:1,method:'tools/list'})).toMatchObject({error:{code:-32000}});const {handler}=await ready(async()=>{throw Error('/private/secret.txt')});expect(await handler({jsonrpc:'2.0',id:2,method:'tools/call',params:{name:'present',arguments:{text:'x'}}})).toMatchObject({result:{isError:true,content:[{text:'DOT_UNAVAILABLE'}]}})})
 it('cannot override internal dispatch or call arbitrary methods',async()=>{const {handler,forward}=await ready();for(const params of [{name:'shell',arguments:{}},{name:'present',arguments:{type:'cancel',text:'x'}},{name:'cancel',arguments:{path:'/tmp'}}])expect(await handler({jsonrpc:'2.0',id:2,method:'tools/call',params})).toMatchObject({error:{code:-32602}});expect(forward).not.toHaveBeenCalled()})
 it('stdio handles Unicode split across chunks and emits only JSON-RPC',async()=>{const input=new PassThrough(),output=new PassThrough(),data:string[]=[];output.on('data',b=>data.push(b.toString()));const {handler,forward}=await ready();runStdio(input,output,handler);const b=Buffer.from(JSON.stringify({jsonrpc:'2.0',id:4,method:'tools/call',params:{name:'present',arguments:{text:'안녕 😀'}}})+'\n');input.write(b.subarray(0,b.length-4));input.write(b.subarray(b.length-4));await vi.waitFor(()=>expect(data).toHaveLength(1));expect(JSON.parse(data[0]).id).toBe(4);expect(forward).toHaveBeenCalledWith({type:'present',text:'안녕 😀'});input.destroy();output.destroy()})
 it('rejects invalid or missing session endpoint configuration',()=>{expect(()=>localForward({})).toThrow('DOT_CONFIG');expect(()=>localForward({DAEMONLET_3060_DOT_TOKEN:'x'.repeat(32),DAEMONLET_3060_DOT_PORT:'0'})).toThrow();expect(()=>localForward({DAEMONLET_3060_DOT_TOKEN:'x'.repeat(32),DAEMONLET_3060_DOT_PORT:'39471'})).not.toThrow()})
-it('bounds oversized stdio input without executing a tool',()=>{const input=new PassThrough(),output=new PassThrough(),write=vi.fn();output.on('data',write);const h=vi.fn();runStdio(input,output,h);input.write('x'.repeat(16385));expect(input.destroyed).toBe(true);expect(h).not.toHaveBeenCalled();expect(JSON.parse(write.mock.calls[0][0].toString()).error.code).toBe(-32600);output.destroy()})
+it('bounds oversized stdio input without executing a tool',()=>{const input=new PassThrough(),output=new PassThrough(),write=vi.fn();output.on('data',write);const h=vi.fn();runStdio(input,output,h);input.write('x'.repeat(128*1024+1));expect(input.destroyed).toBe(true);expect(h).not.toHaveBeenCalled();expect(JSON.parse(write.mock.calls[0][0].toString()).error.code).toBe(-32600);output.destroy()})
 
 afterEach(()=>vi.restoreAllMocks())
 it('local forward projects only bounded presentation acknowledgements',async()=>{vi.spyOn(globalThis,'fetch').mockResolvedValue(new Response(JSON.stringify({accepted:true,sequence:2,poseFallback:false,voice:'off',privateHistory:'secret'})));const f=localForward({DAEMONLET_3060_DOT_TOKEN:'a'.repeat(32)});expect(await f({type:'cancel'})).toEqual({accepted:true,sequence:2,poseFallback:false,voice:'off'})})
@@ -77,4 +77,22 @@ it('rejects invalid modern list params and keeps exception details private',asyn
 it('rejects invalid params/metadata shapes instead of treating them as stateless consent',async()=>{
  const h=createMcpHandler(vi.fn())
  for(const params of [null,[],{_meta:[]},{_meta:'secret'}])expect(await h({jsonrpc:'2.0',id:1,method:'tools/list',params})).toMatchObject({error:{code:-32602}})
+})
+
+it('forwards the complete original and spoken variant in a single tool call',async()=>{
+ const {handler,forward}=await ready(),text='원문; 수식 a > b.\n'.repeat(120),speechText='에이가 비보다 크다는 내용입니다.\n'.repeat(120)
+ await handler({jsonrpc:'2.0',id:5,method:'tools/call',params:{name:'present',arguments:{text,speechText,speak:true,speechMode:'complete'}}})
+ expect(forward).toHaveBeenCalledExactlyOnceWith({type:'present',text,speechText,speak:true,speechMode:'complete'})
+})
+it('status is read-only and strips unexpected private data from the app response',async()=>{
+ vi.spyOn(globalThis,'fetch').mockResolvedValue(new Response(JSON.stringify({sequence:4,phase:'completed',muted:false,paused:false,available:true,text:'private',speechText:'private',history:['private']})))
+ const forward=localForward({DAEMONLET_3060_DOT_TOKEN:'a'.repeat(32)})
+ expect(await forward({type:'status'})).toEqual({sequence:4,phase:'completed',muted:false,paused:false,available:true})
+ const {handler}=await ready(forward)
+ expect(await handler({jsonrpc:'2.0',id:3,method:'tools/call',params:{name:'status',arguments:{path:'/private'}}})).toMatchObject({error:{code:-32602}})
+})
+it('stdio accepts a full pair even when Unicode is JSON-escaped',async()=>{
+ const input=new PassThrough(),output=new PassThrough(),data:string[]=[];output.on('data',b=>data.push(b.toString()));const {handler,forward}=await ready();runStdio(input,output,handler)
+ const text='가'.repeat(6000),message=JSON.stringify({jsonrpc:'2.0',id:7,method:'tools/call',params:{name:'present',arguments:{text,speechText:text,speak:true,speechMode:'complete'}}}).replaceAll('가','\\uac00')+'\n'
+ input.write(message);await vi.waitFor(()=>expect(data).toHaveLength(1));expect(forward).toHaveBeenCalledOnce();expect(input.destroyed).toBe(false);input.destroy();output.destroy()
 })

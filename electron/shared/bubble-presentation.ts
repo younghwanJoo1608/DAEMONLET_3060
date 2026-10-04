@@ -1,3 +1,4 @@
+import { DOT_FULL_TEXT_LIMIT } from "./dot-presentation"
 import { validSpeechOutline, type SpeechOutline } from "./speech-outline"
 
 /** Only local geometry, presentation state and authored dialogue cross this bridge. */
@@ -28,7 +29,7 @@ export function validatePetBubblePresentation(v: unknown): PetBubblePresentation
   if ("speech" in r) {
     const s = r.speech as SpeechBubbleContent | null
     if (!s || typeof s !== "object" || Array.isArray(s) || Object.keys(s).filter(key => key !== "outline" && key !== "dotSequence").sort().join() !== "fadeMs,height,text,width"
-      || typeof s.text !== "string" || !s.text.trim() || [...s.text].length > (s.dotSequence === undefined ? 36 : 600)
+      || typeof s.text !== "string" || !s.text.trim() || (s.dotSequence === undefined ? [...s.text].length > 36 : s.text.length > DOT_FULL_TEXT_LIMIT)
       || !Number.isInteger(s.width) || s.width < 24 || s.width > 240
       || !Number.isInteger(s.height) || s.height < 24 || s.height > 240
       || !Number.isFinite(s.fadeMs) || s.fadeMs < 0 || s.fadeMs > 300) return null

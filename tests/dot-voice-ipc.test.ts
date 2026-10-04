@@ -71,7 +71,8 @@ it('only announced and claimed trusted current pet audio starts the presentation
  const visible=vi.spyOn(f.window,'isVisible').mockReturnValue(false);await scheduled();expect(started).not.toHaveBeenCalled();visible.mockReturnValue(true)
  c.service.state.epoch=11;await scheduled();expect(started).not.toHaveBeenCalled();c.service.state.epoch=10
  await scheduled(id,10,240);await scheduled(id,10,500);expect(started).toHaveBeenCalledExactlyOnceWith(240)
- abort.abort();await scheduled();expect(started).toHaveBeenCalledTimes(1);finish();await task
+ const next='c'.repeat(36);c.send(VOICE_IPC.event,{type:'audio',audioId:next,epoch:10});f.handler(DOT_IPC.audio)({} as any,next,10);await scheduled(next,10,100);await scheduled(next,10,200);expect(started.mock.calls).toEqual([[240],[100]])
+ abort.abort();await scheduled();expect(started).toHaveBeenCalledTimes(2);finish();await task
 })
 it('cleanup preserves preparation failure instead of reporting a successful stopped voice',async()=>{
  const f=await fixture();vi.spyOn(f.controller,'presentationVoiceIssue').mockReturnValue(false);vi.spyOn(f.controller.service,'setOutputReady').mockImplementation(()=>{});(f.controller as any).petReady=true

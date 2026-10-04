@@ -10,7 +10,7 @@ describe("bounded full dot text", () => {
     const { dotSequence: _, ...authored } = speech
     expect(validatePetBubblePresentation({ ...report, speech: authored })).toBeNull()
     for (const dotSequence of [0, -1, 1.5, Infinity, "1"]) expect(validatePetBubblePresentation({ ...report, speech: { ...speech, dotSequence } })).toBeNull()
-    expect(validatePetBubblePresentation({ ...report, speech: { ...speech, text: "한".repeat(601) } })).toBeNull()
+    expect(validatePetBubblePresentation({ ...report, speech: { ...speech, text: "한".repeat(6001) } })).toBeNull()
     expect(validatePetBubblePresentation({ ...report, speech: { ...authored, text: "기존 짧은 대사" } })).not.toBeNull()
   })
   it("rejects arbitrary geometry/fields and invalid sizes", () => {

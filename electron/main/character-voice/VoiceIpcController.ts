@@ -29,7 +29,7 @@ export class VoiceIpcController {
  private petReady=false
  private presentationOutput=false
  private presentationGeneration=0
- private presentationPlayback:{generation:number;signal:AbortSignal;epoch:number|null;announced:Set<string>;claimed:Set<string>;started:boolean;scheduled:(delayMs:number)=>void}|null=null
+ private presentationPlayback:{generation:number;signal:AbortSignal;epoch:number|null;announced:Set<string>;claimed:Set<string>;scheduledIds:Set<string>;started:boolean;scheduled:(delayMs:number)=>void}|null=null
  private presentationDetach:Array<()=>void>=[]
  private presentationAttachment:Promise<void>|null=null
  attachPresentationWindow(win:BrowserWindow):Promise<void>{
@@ -61,13 +61,13 @@ export class VoiceIpcController {
  async speakPresentation(text:string,signal:AbortSignal,scheduled:(delayMs:number)=>void=()=>{}){
   if(this.playbackReady||!this.petOutput||this.petOutput.isDestroyed()||!this.petOutput.isVisible()||this.presentationVoiceIssue())throw Error('VOICE_PRESENTATION_UNAVAILABLE')
   const generation=++this.presentationGeneration;this.presentationOutput=true
-  this.presentationPlayback={generation,signal,epoch:null,announced:new Set(),claimed:new Set(),started:false,scheduled}
+  this.presentationPlayback={generation,signal,epoch:null,announced:new Set(),claimed:new Set(),scheduledIds:new Set(),started:false,scheduled}
   this.service.setOutputReady(true,false,'presentation')
   let outcome:'completed'|'cancelled'|'failed'='cancelled',failure:unknown
   try{await this.service.speakPresentation(text,signal);outcome=signal.aborted?'cancelled':'completed'}
   catch(e){failure=e;outcome=e instanceof Error&&e.message==='VOICE_CANCELLED'?'cancelled':'failed';throw e}
   finally{
-   if(signal.aborted&&signal.reason instanceof Error&&signal.reason.message==='VOICE_PRESENTATION_PREPARATION_TIMEOUT'){outcome='failed';failure=signal.reason}
+   if(signal.aborted&&signal.reason instanceof Error&&['VOICE_PRESENTATION_PREPARATION_TIMEOUT','VOICE_PRESENTATION_STALLED','VOICE_PRESENTATION_SPEECH_TIMEOUT'].includes(signal.reason.message)){outcome='failed';failure=signal.reason}
    if(generation===this.presentationGeneration)await this.stopPresentation(outcome,failure)
   }
  }
@@ -120,7 +120,7 @@ export class VoiceIpcController {
   ipcMain.handle(DOT_IPC.voiceAction,async(event,v:VoiceAction)=>{
    if(this.closing||!this.petOutput||!isTrustedSender(event,this.petOutput,'pet',this.devServerUrl)||!v||!['played','scheduled','outputStopped'].includes(v.type)||!this.presentationOutput)throw Error('UNTRUSTED_SENDER')
    const accepted=await this.action(v),run=this.presentationPlayback
-   if(v.type==='scheduled'&&accepted===true&&run&&!run.started&&!run.signal.aborted&&run.generation===this.presentationGeneration&&run.epoch===v.epoch&&v.epoch===this.service.snapshot().epoch&&run.claimed.has(v.audioId)&&this.presentationOutput&&this.petReady&&!!this.petOutput?.isVisible()&&!this.petOutput.webContents.isDestroyed()&&!this.playbackReady){run.started=true;run.scheduled(v.delayMs)}
+   if(v.type==='scheduled'&&accepted===true&&run&&!run.scheduledIds.has(v.audioId)&&!run.signal.aborted&&run.generation===this.presentationGeneration&&run.epoch===v.epoch&&v.epoch===this.service.snapshot().epoch&&run.claimed.has(v.audioId)&&this.presentationOutput&&this.petReady&&!!this.petOutput?.isVisible()&&!this.petOutput.webContents.isDestroyed()&&!this.playbackReady){run.started=true;run.scheduledIds.add(v.audioId);run.scheduled(v.delayMs)}
    return {epoch:this.service.snapshot().epoch} // no history/settings projection
   })
   ipcMain.handle(DOT_IPC.audio,(event,id:unknown,epoch:unknown)=>{

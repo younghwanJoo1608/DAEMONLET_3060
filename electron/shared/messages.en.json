@@ -1550,5 +1550,7 @@
   "이용 조건 문서 또는 적용 파일이 변경되었습니다. 배포본을 확인해 주세요.": "The terms or covered files have changed. Check the distribution package.",
   "이용 조건 문서를 열지 못했습니다. 텍스트 보기로 확인해 주세요.": "Could not open the terms document. Try the text version.",
   "필요한 파일 받기·연결을 눌러 받은 파일을 검사하고 현재 엔진에 연결해 주세요.": "Click Get required files and connect to verify existing files and connect them to the current engine.",
-  "이 비공식 RTX 3060 포크는 앱 내 업데이트를 사용하지 않습니다. 포크의 릴리스 페이지에서 수동 설치하세요.": "This unofficial RTX 3060 fork disables in-app updates. Install manually from the fork release page."
+  "이 비공식 RTX 3060 포크는 앱 내 업데이트를 사용하지 않습니다. 포크의 릴리스 페이지에서 수동 설치하세요.": "This unofficial RTX 3060 fork disables in-app updates. Install manually from the fork release page.",
+  "음성 재생이 멈춰 낭독을 중단했어요. 다시 시도해 주세요.": "Reading stopped because audio playback stalled. Please try again.",
+  "최대 낭독 시간 10분에 도달해 중단했어요. 남은 내용을 나누어 요청해 주세요.": "Reading stopped at the 10-minute limit. Please request the remaining content separately."
 }

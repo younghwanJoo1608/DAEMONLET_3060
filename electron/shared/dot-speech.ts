@@ -1,5 +1,5 @@
 import type { BubbleRect } from "./bubble-position"
-/** DIP limits independent of Pet scale. Scrolling retains all 600 code points. */
+/** DIP limits independent of Pet scale. Scrolling retains the bounded complete display text. */
 export function dotSpeechViewport(area: Pick<BubbleRect, "width" | "height">) {
   return { width: Math.max(24, Math.min(480, area.width - 28)), height: Math.max(24, Math.min(480, area.height - 28)) }
 }
