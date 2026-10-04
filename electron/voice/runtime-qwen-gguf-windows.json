@@ -35,24 +35,24 @@
   },
   "binaries": {
     "ggml-base.dll": {
-      "bytes": 655872,
-      "sha256": "f5a881ebd14042ed9f83ef3df12263502ddba9c0aa9ebb8f6ca96d179c5be431"
+      "bytes": 656384,
+      "sha256": "09f8eabd9f22dafc2cb1760f444c61394637cd6ab973b3a10d35d6a3ad9959b0"
     },
     "ggml-cpu.dll": {
-      "bytes": 863232,
-      "sha256": "3870cde230d090b845c817d62243153267361c4c6fed61e98e339bb6e2aedf38"
+      "bytes": 865280,
+      "sha256": "5c60f191dd4b0413710f3e0104f1825eed8a5a3e0d566365029629d27ef650a8"
     },
     "ggml-cuda.dll": {
-      "bytes": 51713024,
-      "sha256": "caf3f479c5efef5e5f36ea2e1187c1c5be8cc5afaadaa6c8781dd20a4e5b6e25"
+      "bytes": 87540736,
+      "sha256": "a223d6db26d15431335592cb4e9442bafaf07f66d4258c195683723ec8300335"
     },
     "ggml.dll": {
       "bytes": 52736,
-      "sha256": "90cb580bac9e57c33398bc4693463f6d1579e741d019181b04384db0501fb142"
+      "sha256": "c15c95ffe23cea1335c14e6c75ab49eca13c34a24cc6d2e3b555166d583eef0a"
     },
     "qwen.dll": {
       "bytes": 309760,
-      "sha256": "cc1d71fe19e319d487f1a68f0b25aed62b6db9b619769eb2f33bd98078f09734"
+      "sha256": "65c9e0b7f89182047339687b05ed20ec49e36528fed82fcf35666cdd62799505"
     }
   },
   "abiLayout": {
@@ -122,14 +122,15 @@
   "build": {
     "generator": "Visual Studio 17 2022",
     "toolset": "MSVC 14.35.32215",
-    "cmake": "3.25.1",
+    "cmake": "4.2.3",
     "cuda": "13.0.48",
-    "cudaArchitectures": "89",
+    "cudaArchitectures": "86;89",
     "GGML_CUDA": true,
     "GGML_CUDA_GRAPHS": true,
     "GGML_CUDA_CUB_3DOT2": false,
     "GGML_CUDA_NCCL": false,
-    "QWEN_SHARED": true
+    "QWEN_SHARED": true,
+    "windowsSdk": "10.0.22621.0"
   },
   "sampling": {
     "maxNewTokens": 720,
@@ -145,37 +146,38 @@
       "backend": "cuda:0",
       "binaries": {
         "ggml-base.dll": {
-          "bytes": 655872,
-          "sha256": "f5a881ebd14042ed9f83ef3df12263502ddba9c0aa9ebb8f6ca96d179c5be431"
+          "bytes": 656384,
+          "sha256": "09f8eabd9f22dafc2cb1760f444c61394637cd6ab973b3a10d35d6a3ad9959b0"
         },
         "ggml-cpu.dll": {
-          "bytes": 863232,
-          "sha256": "3870cde230d090b845c817d62243153267361c4c6fed61e98e339bb6e2aedf38"
+          "bytes": 865280,
+          "sha256": "5c60f191dd4b0413710f3e0104f1825eed8a5a3e0d566365029629d27ef650a8"
         },
         "ggml-cuda.dll": {
-          "bytes": 51713024,
-          "sha256": "caf3f479c5efef5e5f36ea2e1187c1c5be8cc5afaadaa6c8781dd20a4e5b6e25"
+          "bytes": 87540736,
+          "sha256": "a223d6db26d15431335592cb4e9442bafaf07f66d4258c195683723ec8300335"
         },
         "ggml.dll": {
           "bytes": 52736,
-          "sha256": "90cb580bac9e57c33398bc4693463f6d1579e741d019181b04384db0501fb142"
+          "sha256": "c15c95ffe23cea1335c14e6c75ab49eca13c34a24cc6d2e3b555166d583eef0a"
         },
         "qwen.dll": {
           "bytes": 309760,
-          "sha256": "cc1d71fe19e319d487f1a68f0b25aed62b6db9b619769eb2f33bd98078f09734"
+          "sha256": "65c9e0b7f89182047339687b05ed20ec49e36528fed82fcf35666cdd62799505"
         }
       },
       "build": {
         "generator": "Visual Studio 17 2022",
         "toolset": "MSVC 14.35.32215",
-        "cmake": "3.25.1",
+        "cmake": "4.2.3",
         "cuda": "13.0.48",
-        "cudaArchitectures": "89",
+        "cudaArchitectures": "86;89",
         "GGML_CUDA": true,
         "GGML_CUDA_GRAPHS": true,
         "GGML_CUDA_CUB_3DOT2": false,
         "GGML_CUDA_NCCL": false,
-        "QWEN_SHARED": true
+        "QWEN_SHARED": true,
+        "windowsSdk": "10.0.22621.0"
       }
     },
     "vulkan": {
@@ -264,7 +266,7 @@
   },
   "managedRuntimeCatalog": {
     "filename": "managed-gguf-runtime-catalog.json",
-    "bytes": 693831,
-    "sha256": "5487a3d3b42fa58e4dcf9ebf19c3540296c93c3075510b115319a9641df5186e"
+    "bytes": 694075,
+    "sha256": "700b89f333b6217a91a3158a7367b8500a67723e28db392c247b3d5a43d9a50a"
   }
 }

@@ -35,7 +35,7 @@ export class HookIngressServer {
     this.options = options
     this.host = options.host ?? "127.0.0.1"
     if (this.host !== "127.0.0.1") throw new Error("hook ingress must bind to 127.0.0.1")
-    this.port = options.port ?? 4175
+    this.port = options.port ?? 4675
     this.diagnostics = { endpoint: `http://${this.host}:${this.port}/hook`, accepted: 0, rejected: 0, authFailures: 0, timeouts: 0, lastEventAt: null, events: emptyHookReceipts() }
   }
 

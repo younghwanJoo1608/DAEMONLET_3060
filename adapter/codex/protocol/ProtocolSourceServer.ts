@@ -73,7 +73,7 @@ export class ProtocolSourceServer {
     this.options = options
     this.host = options.host ?? "127.0.0.1"
     if (this.host !== "127.0.0.1") throw new Error("protocol source must bind to 127.0.0.1")
-    this.port = options.port ?? 4174
+    this.port = options.port ?? 4674
     this.heartbeatIntervalMs = options.heartbeatIntervalMs ?? 5_000
     this.maxClients = options.maxClients ?? 8
     if (!Number.isSafeInteger(this.maxClients) || this.maxClients < 1 || this.maxClients > 32) throw new Error("maxClients must be an integer from 1 through 32")

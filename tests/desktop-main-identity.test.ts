@@ -16,7 +16,7 @@ it("uses the application profile before the real entry point requests its instan
   vi.stubEnv("ELECTRON_SMOKE_USER_DATA", "")
   try {
     await import("../electron/main/main")
-    expect(state.lockedProfile).toBe(join("/profiles", "Daemonlet for Codex"))
+    expect(state.lockedProfile).toBe(join("/profiles", "Daemonlet 3060"))
     expect(state.paths.get("sessionData")).toBe(state.lockedProfile)
   } finally { vi.unstubAllEnvs() }
 })

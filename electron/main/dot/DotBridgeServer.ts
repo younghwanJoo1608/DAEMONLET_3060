@@ -2,8 +2,8 @@ import {createServer,type Server} from 'node:http'
 import {timingSafeEqual} from 'node:crypto'
 import type {DotPresentationService} from './DotPresentationService'
 export function dotBridgeConfig(env:NodeJS.ProcessEnv){
- if(env.DAEMONLET_DOT_BRIDGE!=='1')return null
- const token=env.DAEMONLET_DOT_TOKEN??'',port=Number(env.DAEMONLET_DOT_PORT??39471)
+ if(env.DAEMONLET_3060_DOT_BRIDGE!=='1')return null
+ const token=env.DAEMONLET_3060_DOT_TOKEN??'',port=Number(env.DAEMONLET_3060_DOT_PORT??39531)
  if(!/^[a-zA-Z0-9_-]{32,128}$/.test(token)||!Number.isInteger(port)||port<1024||port>65535)throw Error('DOT_CONFIG')
  return {token,port}
 }

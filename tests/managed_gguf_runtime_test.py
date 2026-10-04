@@ -404,6 +404,45 @@ class ManagedGpuGateTests(unittest.TestCase):
             value=managed.verify_gpu_support(dict(self.admitted,runtimeId='qwen-vulkan',backend='Vulkan0'))
             self.assertEqual(value,dict(managedCudaCompatibilityQueried=False))
 
+    def sm86_candidate(self):
+        self.admitted['support'].update(cudaComputeCapabilities=[[8,6],[8,9]],
+            validatedGpuNames=[], validationScope='qwen-sm86-build-candidate')
+        self.admitted['nativeProvenance']=dict(kind='qwen-sm86-source-build',
+            cudaArchitectures=[86,89],cudaVersion='13.0',gpuInferenceValidated=False,
+            sourceCommit='6fae92914045cd83364d2845ceaa0f7969727319',
+            ggmlCommit='40e16e4a814f7fe851a0c486fb9e8c722e957830')
+
+    def test_sm86_candidate_keeps_actual_gpu_and_driver_checks(self):
+        self.sm86_candidate()
+        for capability in ((8,6),(8,9)):
+            result=self.query(FakeDriver(capability=capability))
+            self.assertEqual(result['cudaComputeCapability'],list(capability))
+            self.assertEqual(result['validatedGpuNames'],[])
+        for driver in (FakeDriver(capability=(7,5)),FakeDriver(version=12090)):
+            with self.assertRaises(ValueError): self.query(driver)
+
+    def test_catalog_capability_edit_cannot_admit_old_sm89_build(self):
+        self.admitted['support']['cudaComputeCapabilities']=[[8,6],[8,9]]
+        with self.assertRaises(ValueError): self.query(FakeDriver(capability=(8,6)))
+
+    def test_sm86_candidate_is_qwen_only_and_requires_build_provenance(self):
+        self.sm86_candidate()
+        self.admitted['runtimeId']='vox-cuda'
+        with self.assertRaises(ValueError): self.query(FakeDriver(capability=(8,6)))
+        self.admitted['runtimeId']='qwen-cuda'
+        for key,value in [('cudaArchitectures',[89]),('sourceCommit','0'*40),
+                          ('ggmlCommit','0'*40),('cudaVersion','11.3'),
+                          ('gpuInferenceValidated',True),('kind','unreviewed')]:
+            self.sm86_candidate()
+            self.admitted['nativeProvenance'][key]=value
+            with self.subTest(key=key),self.assertRaises(ValueError):
+                self.query(FakeDriver(capability=(8,6)))
+
+    def test_sm86_candidate_cannot_claim_hardware_validation(self):
+        self.sm86_candidate()
+        self.admitted['support']['validatedGpuNames']=['RTX 3060 Ti']
+        with self.assertRaises(ValueError): self.query(FakeDriver(capability=(8,6)))
+
 
 class IsolatedStartupTests(unittest.TestCase):
     def test_workers_import_only_adjacent_modules_under_isolated_python(self):

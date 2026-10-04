@@ -19,7 +19,7 @@ npm run macos:verify -- --candidate /absolute/candidate [--app /absolute/copy.ap
 
 npm run macos:notarize -- prepare --candidate /absolute/candidate [--retry-reason "reason"]
   Freezes submission.zip; prints SHA-256 and size for explicit user approval.
-  MACOS_NOTARY_PROFILE defaults to daemonlet-notary (default credential store).
+  MACOS_NOTARY_PROFILE defaults to daemonlet-3060-notary (default credential store).
 npm run macos:notarize -- submit --candidate /absolute/candidate --approved-sha256 <approved-sha256>
   Uploads precisely that archive to Apple. Run only after explicit upload approval.
 npm run macos:notarize -- status --candidate /absolute/candidate [--submission-id <recovered-original-id>]

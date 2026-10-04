@@ -33,7 +33,7 @@ if (values.serve) {
   assertSameSource(source, await readBuildSource(root))
   await mkdir(output); await mkdir(feed)
   const signer = mac ? JSON.parse(await readFile(resolve(values['signing-manifest']), 'utf8')).signer : null
-  const reviewId = 'io.github.ddol2ya.daemonlet.update-review.' + createHash('sha256').update(output).digest('hex').slice(0, 12)
+  const reviewId = 'io.github.younghwanjoo1608.daemonlet3060.update-review.' + createHash('sha256').update(output).digest('hex').slice(0, 12)
   const installationDirectory = join(output, '설치 시험')
   const profile = join(output, 'profile')
   await mkdir(profile)
@@ -77,7 +77,7 @@ if (values.serve) {
       const artifacts = await buildInstaller({ projectDir, prepackaged: apps.at(-1), targets: Platform.WINDOWS.createTarget('nsis', Arch.x64), publish: 'never',
         config: { appId: reviewId, productName: 'Daemonlet update review', executableName: APP_NAME, electronVersion: pkg.devDependencies.electron, publish: null, npmRebuild: false,
           directories: { output: join(projectDir, 'artifacts') }, win: { signAndEditExecutable: false, target: [{ target: 'nsis', arch: ['x64'] }] },
-          nsis: { artifactName: 'Daemonlet-for-Codex-' + version + '-windows-x64-Setup.exe', oneClick: false, perMachine: false, allowElevation: false,
+          nsis: { artifactName: 'Daemonlet-3060-' + version + '-windows-x64-Setup.exe', oneClick: false, perMachine: false, allowElevation: false,
             allowToChangeInstallationDirectory: true, include, createDesktopShortcut: false, createStartMenuShortcut: false, runAfterFinish: false,
             deleteAppDataOnUninstall: false, packElevateHelper: false, differentialPackage: false, uninstallDisplayName: 'Daemonlet update review ' + reviewId.split('.').at(-1) } } })
       const installer = artifacts.find(file => file.endsWith('-Setup.exe'))
@@ -86,7 +86,7 @@ if (values.serve) {
     }
 
   }
-  const file = 'Daemonlet-for-Codex-0.7.3-' + (mac ? 'macOS-arm64.zip' : 'windows-x64-Setup.exe'), archive = join(feed, file)
+  const file = 'Daemonlet-3060-0.7.3-' + (mac ? 'macOS-arm64.zip' : 'windows-x64-Setup.exe'), archive = join(feed, file)
   if (mac) await run('/usr/bin/ditto', ['-c', '-k', '--sequesterRsrc', '--keepParent', apps[1], archive], { timeout: 180000 })
   else await cp(installers[1], archive)
   const hash = createHash('sha512'); for await (const part of createReadStream(archive)) hash.update(part)

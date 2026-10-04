@@ -1,3 +1,4 @@
+import { APP_NAME } from "../../electron/shared/app-identity.mjs"
 import {BelleConnectionPage} from './BelleConnectionPage'
 import {ChatVoicePage} from './ChatVoicePage'
 import { UpdatesPage } from "./UpdatesPage"
@@ -55,7 +56,7 @@ export function SettingsApp() {
 
   return <div className="settings-shell">
     <aside className="settings-sidebar">
-      <div className="brand"><span className="brand-mark" aria-hidden="true">D</span><span>Daemonlet</span></div>
+      <div className="brand"><span className="brand-mark" aria-hidden="true">D</span><span>{APP_NAME}<small className="fork-badge">SM86 · unofficial</small></span></div>
       <nav className="settings-nav" role="tablist" aria-label={t("설정")} aria-orientation="vertical">
         {tabs.map((item, index) => <button key={item.id} id={`tab-${item.id}`} role="tab" aria-label={t(item.label)} aria-selected={tab === item.id} aria-controls={`panel-${item.id}`} tabIndex={tab === item.id ? 0 : -1} onKeyDown={(event) => moveTab(event, index)} onClick={() => setTab(item.id)}><span aria-hidden="true">{item.glyph}</span>{t(item.label)}</button>)}
       </nav>

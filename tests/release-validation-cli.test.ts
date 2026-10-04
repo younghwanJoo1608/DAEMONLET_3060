@@ -20,7 +20,7 @@ async function repository() {
   await writeFile(join(root, '.gitignore'), 'outputs/\nnode_modules\n')
   await symlink(resolve('node_modules'), join(root, 'node_modules'), process.platform === 'win32' ? 'junction' : 'dir')
   await writeFile(join(root, 'source.txt'), 'tracked source A\n')
-  await writeFile(join(root, 'package.json'), JSON.stringify({name: 'daemonlet-for-codex', version: '0.7.0', type: 'module'}))
+  await writeFile(join(root, 'package.json'), JSON.stringify({name: 'daemonlet-3060', version: '0.7.0', type: 'module'}))
   const git = (...args: string[]) => execFileSync('git', args, {cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe']}).trim()
   git('init', '-q'); git('config', 'user.name', 'Validation Test'); git('config', 'user.email', 'test@example.com')
   git('config', 'core.hooksPath', join(root, 'outputs/no-hooks')); git('config', 'commit.gpgSign', 'false'); git('config', 'core.autocrlf', 'false')
@@ -32,7 +32,7 @@ async function repository() {
 async function asar(root: string, name: string, source: unknown = A, version: unknown = '0.7.0', renderer: unknown = source) {
   const stage = join(root, 'outputs', name + '-stage')
   await mkdir(join(stage, 'dist'), {recursive: true}); await mkdir(join(stage, 'dist-electron'))
-  await writeFile(join(stage, 'package.json'), JSON.stringify({name: 'daemonlet-for-codex', version}))
+  await writeFile(join(stage, 'package.json'), JSON.stringify({name: 'daemonlet-3060', version}))
   if (source !== null) await writeFile(join(stage, 'dist-electron/build-source.json'), JSON.stringify(source))
   if (renderer !== null) await writeFile(join(stage, 'dist/build-source.json'), JSON.stringify(renderer))
   const path = join(root, 'outputs', name + '.asar'); await createPackage(stage, path); return path
@@ -179,23 +179,23 @@ describe.each(['unit', 'build'])('%s execution rechecks its source', {timeout: 1
 describe('updater metadata from packaged provenance', () => {
   it('uses the real ZIP source schema and emits review-only metadata', async () => {
     const {createUpdateMetadata} = await import('../scripts/release/update-metadata.mjs')
-    const f = await repository(), file = 'Daemonlet-for-Codex-0.7.0-macOS-arm64.zip'
+    const f = await repository(), file = 'Daemonlet-3060-0.7.0-macOS-arm64.zip'
     const path = await asar(f.root, 'metadata')
-    await zip(f.root, file, [['Daemonlet for Codex.app/Contents/Resources/app.asar', await readFile(path)]])
+    await zip(f.root, file, [['Daemonlet 3060.app/Contents/Resources/app.asar', await readFile(path)]])
     const result = await createUpdateMetadata({artifact: join(f.root, 'outputs', file), output: join(f.root, 'outputs/feed'), platform: 'darwin', minimumSystemVersion: '22.0.0', manifest: undefined, packagingResult: undefined, review: true})
     expect(result).toMatchObject({version: '0.7.0', published: false, verification: 'REVIEW_ONLY_NOT_DISTRIBUTABLE'})
     expect(JSON.parse(await readFile(result.metadata, 'utf8')).daemonlet.reviewOnly).toBe(true)
   })
   it('rejects a packaged dirty source even in review mode', async () => {
     const {createUpdateMetadata} = await import('../scripts/release/update-metadata.mjs')
-    const f = await repository(), file = 'Daemonlet-for-Codex-0.7.0-macOS-arm64.zip'
+    const f = await repository(), file = 'Daemonlet-3060-0.7.0-macOS-arm64.zip'
     const path = await asar(f.root, 'dirty-metadata', {...A, workingTreeHasChanges: true})
-    await zip(f.root, file, [['Daemonlet for Codex.app/Contents/Resources/app.asar', await readFile(path)]])
+    await zip(f.root, file, [['Daemonlet 3060.app/Contents/Resources/app.asar', await readFile(path)]])
     await expect(createUpdateMetadata({artifact: join(f.root, 'outputs', file), output: join(f.root, 'outputs/feed'), platform: 'darwin', minimumSystemVersion: '22.0.0', manifest: undefined, packagingResult: undefined, review: true})).rejects.toThrow('Clean stable source identity')
   })
   it('binds Windows metadata to the EXE hash and explicit unsigned policy', async () => {
     const {createUpdateMetadata} = await import('../scripts/release/update-metadata.mjs')
-    const f = await repository(), output = join(f.root, 'outputs'), name = 'Daemonlet-for-Codex-0.7.0-windows-x64-Setup.exe'
+    const f = await repository(), output = join(f.root, 'outputs'), name = 'Daemonlet-3060-0.7.0-windows-x64-Setup.exe'
     await writeFile(join(output, name), 'MZ synthetic metadata fixture')
     const file = await fileIdentity(output, name), receipt = join(output, 'installer-build-result.json')
     await writeFile(receipt, JSON.stringify({schemaVersion: 1, kind: 'windows-installer-build', source: A, appVersion: '0.7.0', files: [file], runtimeUnchanged: true, signing: 'unsigned'}))

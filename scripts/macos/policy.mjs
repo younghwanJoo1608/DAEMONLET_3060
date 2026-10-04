@@ -3,7 +3,7 @@ import { isSigningTarget } from "./binary.mjs"
 
 import { APP_NAME, BUNDLE_ID } from "../../electron/shared/app-identity.mjs"
 export { APP_NAME, BUNDLE_ID }
-export const NOTARY_PROFILE = "daemonlet-notary"
+export const NOTARY_PROFILE = "daemonlet-3060-notary"
 export const JIT_ENTITLEMENT = "com.apple.security.cs.allow-jit"
 export const AUDIO_INPUT_ENTITLEMENT = "com.apple.security.device.audio-input"
 // This input is signed before its exact bytes are pinned in runtime-catalog.json.

@@ -1,3 +1,4 @@
+import { UPDATE_CONFIG } from "../../electron/shared/app-identity.mjs"
 import { APP_NAME, BUNDLE_ID } from "../../electron/shared/app-identity.mjs"
 import { extractFile, listPackage } from '@electron/asar'
 import { readFile } from 'node:fs/promises'
@@ -42,7 +43,7 @@ async function checkProduction(asar, sourceOnlyRuntime) {
   const managedRuntimeBuild = json('dist-electron/managed-gguf-runtime-build.json')
   verifyManagedRuntimeBuildReport(managedRuntimeBuild, extract('dist-electron/voice/' + managedRuntimeCatalogName), { sourceOnlyRuntime })
   const update = json('dist-electron/app-update.yml')
-  if (JSON.stringify(update) !== JSON.stringify({ provider: 'github', owner: 'ddol2ya', repo: 'DAEMONLET', private: false, updaterCacheDirName: 'daemonlet-for-codex-updater' }) || !graph.inputs.includes('electron/main/updates/OfficialUpdater.ts')) throw Error('Unverified updater configuration')
+  if (JSON.stringify(update) !== JSON.stringify(UPDATE_CONFIG) || !graph.inputs.includes('electron/main/updates/OfficialUpdater.ts')) throw Error('Unverified updater configuration')
   const main = extract('dist-electron/main.cjs').toString('utf8')
   if (['fresh-approval-four-submissions', 'user-authorized-six-requests', 'private-official-answers', 'DAEMONLET_CHAT_SMOKE', 'readOnlySource', 'SOURCE_RUNTIME_UNSUPPORTED', 'UPDATE_SMOKE_ONLY', 'update-smoke.json', 'approve-install'].some(marker => main.includes(marker))) throw new Error('Side chat QA or custom code shipped')
   for (const required of ['dist/activity-bubble.html', 'dist-electron/activity-preload.cjs', 'dist/characters/gpichan/persona.json']) if (!files.includes(required)) throw new Error('Missing side chat runtime asset: ' + required)

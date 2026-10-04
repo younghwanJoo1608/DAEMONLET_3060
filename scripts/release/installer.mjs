@@ -1,5 +1,5 @@
 import {verifyRuntime} from '../../electron/main/character-chat/runtime-artifacts.mjs'
-import { APP_NAME, BUNDLE_ID } from "../../electron/shared/app-identity.mjs"
+import { APP_NAME, BUNDLE_ID, UPDATE_CONFIG } from "../../electron/shared/app-identity.mjs"
 // Prepare an isolated NSIS build project from an already verified Windows app.
 // Only the staged application is passed to --prepackaged; this repository and
 // the build project (including npm/build tools) are never installer payloads.
@@ -25,7 +25,7 @@ if (Boolean(values.publisher) !== Boolean(values["certificate-sha1"]) || values[
 const staged = join(output, 'runtime')
 await cp(app, staged, { recursive: true })
 await verifyRuntime(join(staged, 'resources/local-llm'), 'win32-x64')
-const updateConfig = { provider: "github", owner: "ddol2ya", repo: "DAEMONLET", private: false, updaterCacheDirName: "daemonlet-for-codex-updater", ...(values.publisher ? { publisherName: [values.publisher] } : {}) }
+const updateConfig = { ...UPDATE_CONFIG, ...(values.publisher ? { publisherName: [values.publisher] } : {}) }
 if (values.publisher) {
   if (process.platform !== "win32") throw Error("Verify signed installer input on Windows")
   const { verifySignature } = await import("electron-updater/out/windowsExecutableCodeSignatureVerifier.js")
@@ -54,7 +54,7 @@ checkInstallerPayload(files, join(staged, 'resources/app.asar'))
 const appPackage = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'))
 const identity = await readAsarIdentity(join(staged, 'resources/app.asar'))
 await writeFile(join(output, 'payload.json'), JSON.stringify({ source: identity.source, appVersion: identity.appVersion, checks, files }, null, 2) + '\n')
-await writeFile(join(output, 'package.json'), JSON.stringify({ name: 'daemonlet-test-installer-build', version: identity.appVersion, description: 'Daemonlet Windows test installer build tools', private: true, license: 'MIT', author: 'Daemonlet contributors', scripts: { build: 'node build.mjs' }, devDependencies: { 'electron-builder': appPackage.devDependencies['electron-builder'], 'electron-updater': appPackage.dependencies['electron-updater'] } }, null, 2) + '\n')
+await writeFile(join(output, 'package.json'), JSON.stringify({ name: 'daemonlet-3060-installer-build', version: identity.appVersion, description: 'Daemonlet 3060 Windows installer build tools', private: true, license: 'MIT', author: 'Daemonlet contributors', scripts: { build: 'node build.mjs' }, devDependencies: { 'electron-builder': appPackage.devDependencies['electron-builder'], 'electron-updater': appPackage.dependencies['electron-updater'] } }, null, 2) + '\n')
 await writeFile(join(output, 'installer.nsh'), (await readFile(join(root, 'scripts/release/nsis-no-force-close.nsh'), 'utf8')) + `\n!macro customInstallMode
   StrCpy $isForceCurrentInstall "1"
 !macroend
@@ -72,7 +72,7 @@ await writeFile(join(output, 'electron-builder.json'), JSON.stringify({
   executableName: APP_NAME, electronVersion: appPackage.devDependencies.electron,
   publish: null, forceCodeSigning: Boolean(values.publisher), npmRebuild: false, directories: { output: 'artifacts', buildResources: '.' },
   win: { target: [{ target: 'nsis', arch: ['x64'] }], icon: "appIcon.ico", signAndEditExecutable: false, ...(values.publisher ? { signtoolOptions: { publisherName: values.publisher, certificateSha1: values["certificate-sha1"], signingHashAlgorithms: ["sha256"] } } : {}) },
-  nsis: { artifactName: `Daemonlet-for-Codex-${identity.appVersion}-windows-x64-Setup.exe`,
+  nsis: { artifactName: `Daemonlet-3060-${identity.appVersion}-windows-x64-Setup.exe`,
     installerIcon: "appIcon.ico", uninstallerIcon: "appIcon.ico",
     oneClick: false, perMachine: false, allowElevation: false, allowToChangeInstallationDirectory: true,
     include: 'installer.nsh', createDesktopShortcut: false, createStartMenuShortcut: true,

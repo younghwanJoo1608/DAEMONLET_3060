@@ -60,7 +60,7 @@ const gguf:VoiceSnapshot={...state,platform:'win32',arch:'x64',engine:'qwen3-tts
 it('GGUF is separately selectable with manual setup and no PyTorch installation action',()=>{
  const html=renderToStaticMarkup(createElement(VoiceSettings,{state:gguf,act:()=>{},playbackReady:true,characterId:'test'}))
  expect(html).toMatch(/<input(?=[^>]*value="qwen-gguf")(?=[^>]*checked="")[^>]*>/)
- for(const text of ['Base Q8','Qwen GGUF Python·DLL·모델 연결','보유한 GGUF 실행 환경 수동 연결','CUDA SDK나 새 GPU 드라이버를 설치하지 않습니다.','compute capability 8.9와 R580 이상','커뮤니티 MIT','Apache-2.0','Qwen GGUF CUDA · 청크 재생','Qwen GGUF CUDA · 완성 후 재생'])expect(html).toContain(text)
+ for(const text of ['Base Q8','Qwen GGUF Python·DLL·모델 연결','보유한 GGUF 실행 환경 수동 연결','CUDA SDK나 새 GPU 드라이버를 설치하지 않습니다.','compute capability 8.6 또는 8.9와 R580 이상','커뮤니티 MIT','Apache-2.0','Qwen GGUF CUDA · 청크 재생','Qwen GGUF CUDA · 완성 후 재생'])expect(html).toContain(text)
  expect(html).not.toContain('Qwen 다운로드 및 설치');expect(html).not.toContain('Qwen 다운로드·설치 후 적용');expect(html).not.toContain('Qwen MLX · 청크 재생')
  expect(html).not.toContain('Qwen GGUF 런타임 다시 연결') // An existing PyTorch connection does not configure GGUF.
  const connected=renderToStaticMarkup(createElement(VoiceSettings,{state:{...gguf,qwenGgufConfigured:true},act:()=>{},playbackReady:true}));expect(connected).toContain('Qwen GGUF 런타임 다시 연결')
@@ -79,7 +79,7 @@ it('both Qwen engines retain WAV and ICL controls but disable trained LoRA and d
  }
 })
 it('GGUF user-facing setup and compatibility guidance has English translations',()=>{
- for(const key of ['Qwen GGUF Python·DLL·모델 연결','Qwen GGUF 런타임 다시 연결','Qwen GGUF CUDA · 청크 재생','Qwen GGUF CUDA · 완성 후 재생','Qwen은 WAV 기준 음성을 사용합니다. VoxCPM2 학습팩의 LoRA 가중치는 적용되지 않습니다. 기존 학습팩은 그대로 보존됩니다.','현재 CUDA 시험 장치는 Windows x64·RTX 4090입니다. Vulkan과 AMD·Intel GPU의 실행은 아직 검증하지 않았습니다.','Qwen GGUF 환경의 Python 선택','검증된 Qwen GGUF CUDA DLL 폴더 선택','Qwen 0.6B Base Q8·codec Q8 모델 폴더 선택'])expect(ENGLISH_MESSAGES[key]).toBeTruthy()
+ for(const key of ['Qwen GGUF Python·DLL·모델 연결','Qwen GGUF 런타임 다시 연결','Qwen GGUF CUDA · 청크 재생','Qwen GGUF CUDA · 완성 후 재생','Qwen은 WAV 기준 음성을 사용합니다. VoxCPM2 학습팩의 LoRA 가중치는 적용되지 않습니다. 기존 학습팩은 그대로 보존됩니다.','Qwen CUDA는 compute capability 8.6 또는 8.9와 R580 이상 NVIDIA 드라이버가 필요합니다. RTX 3060 Ti 8GB에서 음성 생성 시험을 통과했습니다. 앱 전체 검증은 진행 중입니다.','Qwen GGUF 환경의 Python 선택','검증된 Qwen GGUF CUDA DLL 폴더 선택','Qwen 0.6B Base Q8·codec Q8 모델 폴더 선택'])expect(ENGLISH_MESSAGES[key]).toBeTruthy()
 })
 it.each([
  ['QWEN_GGUF_RUNTIME_VERSION','Python 패키지 버전이 맞지 않습니다.'],

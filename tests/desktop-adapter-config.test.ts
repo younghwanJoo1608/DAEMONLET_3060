@@ -7,13 +7,13 @@ describe("desktop adapter runtime config", () => {
     const config = createDesktopAdapterRuntimeConfig({})
     expect(config).toMatchObject({
       protocolHost: "127.0.0.1",
-      protocolPort: 4474,
-      protocolEndpoint: "ws://127.0.0.1:4474/events",
+      protocolPort: 4674,
+      protocolEndpoint: "ws://127.0.0.1:4674/events",
       hookHost: "127.0.0.1",
-      hookPort: 4475,
-      hookEndpoint: "http://127.0.0.1:4475/hook",
+      hookPort: 4675,
+      hookEndpoint: "http://127.0.0.1:4675/hook",
     })
-    expect(config.dataDir).toMatch(/\.daemonlet-for-codex$/)
+    expect(config.dataDir).toMatch(/\.daemonlet-3060$/)
   })
 
   it("validates overrides and derives consistent endpoints", () => {

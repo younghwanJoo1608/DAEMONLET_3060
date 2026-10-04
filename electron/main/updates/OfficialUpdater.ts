@@ -10,7 +10,7 @@ import { execFile } from "node:child_process"
 import { promisify } from "node:util"
 import { homedir, release } from "node:os"
 import { UPDATE_REPOSITORY, type UpdatePlatform, type VerifiedRelease } from "./ReleasePolicy"
-import { BUNDLE_ID } from "../../shared/app-identity.mjs"
+import { BUNDLE_ID, UPDATE_CACHE_NAME } from "../../shared/app-identity.mjs"
 const run = promisify(execFile)
 export interface UpdateEngine {
   check(): Promise<unknown>
@@ -60,7 +60,7 @@ export async function detectUpdatePlatform(allowUnsignedWindows = false): Promis
 /** Only the official provider is constructed here. QA constructs its engine in a separate entry point. */
 export function createOfficialUpdateEngine(allowUnsignedWindows: () => boolean = () => false): UpdateEngine {
   const updater = process.platform === "darwin" ? new MacUpdater(UPDATE_REPOSITORY) : new NsisUpdater(UPDATE_REPOSITORY)
-  return new OfficialUpdateEngine(updater, join(process.platform === "win32" ? process.env.LOCALAPPDATA ?? join(homedir(), "AppData", "Local") : join(homedir(), "Library", "Caches"), "daemonlet-for-codex-updater"), allowUnsignedWindows)
+  return new OfficialUpdateEngine(updater, join(process.platform === "win32" ? process.env.LOCALAPPDATA ?? join(homedir(), "AppData", "Local") : join(homedir(), "Library", "Caches"), UPDATE_CACHE_NAME), allowUnsignedWindows)
 }
 export class OfficialUpdateEngine implements UpdateEngine {
   private file: string | null = null
@@ -134,7 +134,7 @@ export class OfficialUpdateEngine implements UpdateEngine {
     this.installError = onError
     const stop = () => { if (this.installError === onError) this.installError = undefined }
     try {
-      if (process.platform === "win32") process.env.DAEMONLET_OWNED_UPDATE_PID = String(process.pid)
+      if (process.platform === "win32") process.env.DAEMONLET_3060_OWNED_UPDATE_PID = String(process.pid)
       this.updater.quitAndInstall(process.platform === "win32", true)
       return stop
     } catch (error) { stop(); throw error }

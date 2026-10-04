@@ -31,6 +31,10 @@ jobs:
         run: python -B scripts/test-voice-worker.py
       - name: Mac GGUF validation reuse (synthetic files, no GPU or model)
         run: python -B scripts/test-voice-gguf-validation.py
+      - name: Qwen SM86 candidate and runtime admission (CPU only)
+        run: |
+          python -B -m unittest discover -s tests -p qwen_sm86_build_test.py
+          python -B -m unittest discover -s tests -p managed_gguf_runtime_test.py
       - name: GGUF derivative cache integrity (synthetic files, no GPU or model)
         run: python -B scripts/test-voice-gguf-cache.py
       - run: python -m unittest discover -s tests/creator -v
@@ -68,6 +72,10 @@ jobs:
       - name: WAV reference contract (no GPU or model)
         run: python -B scripts/test-voice-reference.py
       - run: npm run build:renderer
+      - name: Qwen SM86 candidate and runtime admission (CPU only)
+        run: |
+          python -B -m unittest discover -s tests -p qwen_sm86_build_test.py
+          python -B -m unittest discover -s tests -p managed_gguf_runtime_test.py
       - name: Compile production sources (native archives are external CI inputs)
         run: npm run build:electron:production -- --source-only-runtime
       - name: Verify production sources and negative controls (no installer acceptance)

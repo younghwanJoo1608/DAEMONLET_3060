@@ -29,6 +29,6 @@ for (const file of files) {
 }
 await verifyArtwork(root)
 const pkg = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'))
-if (pkg.name !== 'daemonlet-for-codex' || pkg.productName !== 'Daemonlet for Codex') failures.push({path: 'package.json', line: 1, type: 'product-identity'})
+if (pkg.name !== 'daemonlet-3060' || pkg.productName !== 'Daemonlet 3060') failures.push({path: 'package.json', line: 1, type: 'product-identity'})
 console.log(JSON.stringify({files: files.length, runtimeAssets: runtime.size, failures}, null, 2))
 if (!files.length || failures.length) process.exitCode = 1

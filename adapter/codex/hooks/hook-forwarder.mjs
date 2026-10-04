@@ -5,7 +5,7 @@ import { join, resolve } from "node:path"
 import { pathToFileURL } from "node:url"
 
 const MAX_BYTES = 64 * 1024
-const DEFAULT_ENDPOINT = "http://127.0.0.1:4175/hook"
+const DEFAULT_ENDPOINT = "http://127.0.0.1:4675/hook"
 
 export function parseLoopbackHookUrl(value) {
   const literal = /^([A-Za-z][A-Za-z0-9+.-]*):\/\/(\[[^\]]+\]|[^:/?#@]+)(?::([0-9]+))?(\/[^?#]*)?$/.exec(value)
@@ -95,7 +95,7 @@ async function forward() {
       const parsed = JSON.parse(body.toString("utf8"))
       const sanitized = sanitizeHookPayload(parsed)
       if (!sanitized.hookEventName) throw new Error("invalid hook input")
-      const dataDir = await realpath(process.env.CODEX_PET_DATA_DIR || join(homedir(), ".codex-pet"))
+      const dataDir = await realpath(process.env.CODEX_PET_DATA_DIR || join(homedir(), ".daemonlet-3060"))
       const configured = process.env.CODEX_PET_HOOK_URL || DEFAULT_ENDPOINT
       const address = configured === "discover" ? await checkedText(join(dataDir, "hook-endpoint"), 128) : configured
       if (configured === "discover" && !/^http:\/\/127\.0\.0\.1:[1-9]\d{0,4}\/hook$/.test(address)) return

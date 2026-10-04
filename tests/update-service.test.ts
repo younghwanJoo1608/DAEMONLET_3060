@@ -4,15 +4,34 @@ import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { UpdateService } from "../electron/main/updates/UpdateService"
 import { BUNDLE_ID } from "../electron/shared/app-identity.mjs"
-const info = { version: "0.7.3", tag: "v0.7.3", path: "Daemonlet-for-Codex-0.7.3-macOS-arm64.zip", sha512: Buffer.alloc(64, 1).toString("base64"), files: [{ url: "Daemonlet-for-Codex-0.7.3-macOS-arm64.zip", size: 1234567, sha512: Buffer.alloc(64, 1).toString("base64") }], minimumSystemVersion: "22.0.0", daemonlet: { appId: BUNDLE_ID, platform: "darwin", arch: "arm64", installType: "mac" } }
+import { RELEASE_ROOT, UPDATES_ENABLED } from "../electron/shared/app-identity.mjs"
+const info = { version: "0.7.3", tag: "v0.7.3", path: "Daemonlet-3060-0.7.3-macOS-arm64.zip", sha512: Buffer.alloc(64, 1).toString("base64"), files: [{ url: "Daemonlet-3060-0.7.3-macOS-arm64.zip", size: 1234567, sha512: Buffer.alloc(64, 1).toString("base64") }], minimumSystemVersion: "22.0.0", daemonlet: { appId: BUNDLE_ID, platform: "darwin", arch: "arm64", installType: "mac" } }
 async function withService(test: (ctx: any) => Promise<void>) {
   const dataRoot = await mkdtemp(join(tmpdir(), "daemonlet-updates-"))
   const engine = { check: vi.fn(async () => info), download: vi.fn(async () => {}), verify: vi.fn(async () => {}), prepare: vi.fn(async () => {}), install: vi.fn(() => () => {}) }
-  const options = { version: "0.7.2", platform: vi.fn(async () => ({ platform: "darwin", arch: "arm64", osVersion: "26.0.0", kind: "mac" as const, automatic: true })), engine: () => engine, dataRoot, autoCheck: vi.fn(() => false), confirmInstall: vi.fn(async () => true), prepareShutdown: vi.fn(async () => {}), handoff: vi.fn(), recoverFailure: vi.fn(), openExternal: vi.fn(async () => {}), now: () => 100000 }
+  const options = { updatesEnabled: true, version: "0.7.2", platform: vi.fn(async () => ({ platform: "darwin", arch: "arm64", osVersion: "26.0.0", kind: "mac" as const, automatic: true })), engine: () => engine, dataRoot, autoCheck: vi.fn(() => false), confirmInstall: vi.fn(async () => true), prepareShutdown: vi.fn(async () => {}), handoff: vi.fn(), recoverFailure: vi.fn(), openExternal: vi.fn(async () => {}), now: () => 100000 }
   const service = new UpdateService(options)
   try { await test({ engine, options, service }) } finally { service.dispose(); await rm(dataRoot, { recursive: true, force: true }) }
 }
 it("does not make startup requests when automatic checks are OFF", () => withService(async ({ engine, service }) => { await service.start(); expect(engine.check).not.toHaveBeenCalled() }))
+it("blocks every update entry by default without network, recovery writes, policy changes or installer handoff", () => withService(async ({ options, engine }) => {
+  const fetchLatest = vi.fn(), setUnsignedWindowsPolicy = vi.fn()
+  const service = new UpdateService({ ...options, updatesEnabled: undefined, autoCheck: () => true, fetchLatest, setUnsignedWindowsPolicy })
+  try {
+    expect(UPDATES_ENABLED).toBe(false)
+    expect(await service.start()).toBe(false)
+    await service.check(true); await service.check(false)
+    for (const action of [{ action: "check" }, { action: "download", candidateId: "anything" }, { action: "installAndRestart", candidateId: "anything" }, { action: "setUnsignedWindowsPolicy", enabled: true }] as const) await service.act(action)
+    expect(service.snapshot()).toMatchObject({ phase: "blocked", reason: "FORK_UPDATES_DISABLED" })
+    expect(options.platform).not.toHaveBeenCalled(); expect(fetchLatest).not.toHaveBeenCalled()
+    expect(engine.check).not.toHaveBeenCalled(); expect(engine.download).not.toHaveBeenCalled(); expect(engine.install).not.toHaveBeenCalled()
+    expect(setUnsignedWindowsPolicy).not.toHaveBeenCalled(); expect(options.handoff).not.toHaveBeenCalled()
+    await expect(readFile(join(options.dataRoot, "update-check.json"))).rejects.toMatchObject({ code: "ENOENT" })
+    await service.act({ action: "openRelease" })
+    expect(options.openExternal).toHaveBeenCalledExactlyOnceWith(RELEASE_ROOT + "/latest")
+    expect(RELEASE_ROOT).toBe("https://github.com/younghwanJoo1608/DAEMONLET_3060/releases")
+  } finally { service.dispose() }
+}))
 it("never downloads during a manual metadata check", () => withService(async ({ engine, service }) => { await service.act({ action: "check" }); expect(service.snapshot().phase).toBe("available"); expect(engine.download).not.toHaveBeenCalled(); expect(engine.prepare).not.toHaveBeenCalled() }))
 it("ignores stale IDs and separates download from staging/restart", () => withService(async ({ engine, service }) => { await service.act({ action: "check" }); await service.act({ action: "download", candidateId: "stale" }); expect(engine.download).not.toHaveBeenCalled(); await service.act({ action: "download", candidateId: service.snapshot().candidateId }); expect(service.snapshot().phase).toBe("downloaded"); expect(engine.prepare).not.toHaveBeenCalled(); expect(engine.install).not.toHaveBeenCalled() }))
 it("consent cancellation preserves child, draft and windows without preparation", () => withService(async ({ engine, options, service }) => { await service.act({ action: "check" }); const candidateId = service.snapshot().candidateId; await service.act({ action: "download", candidateId }); options.confirmInstall.mockResolvedValue(false); await service.act({ action: "installAndRestart", candidateId }); expect(service.snapshot().phase).toBe("downloaded"); expect(options.prepareShutdown).not.toHaveBeenCalled(); expect(engine.prepare).not.toHaveBeenCalled() }))

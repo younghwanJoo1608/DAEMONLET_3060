@@ -360,7 +360,8 @@ def admit(configuration, policy, runtime_id, native_dir, native_receipt=None):
         return dict(runtimeId=runtime_id, root=root, python=python, native=native,
                     nativeReceipt=receipt, dependencyDirs=dependency_dirs, components=paths,
                     catalogSha256=catalog_sha, pythonVersion=runtime['pythonVersion'],
-                    backend=runtime['backend'], support=runtime.get('support'), layout=layout, verified=True)
+                    backend=runtime['backend'], support=runtime.get('support'),
+                    nativeProvenance=components[runtime_id].get('provenance'), layout=layout, verified=True)
     except (OSError, ValueError, TypeError, KeyError, AttributeError, OverflowError):
         raise ValueError(ERROR) from None
 
@@ -409,9 +410,26 @@ driver installation, fallback, downloads or persistent settings changes occur.
     support = admitted.get('support')
     if (not isinstance(support, dict) or type(support.get('minimumCudaDriverApi')) is not int
             or support['minimumCudaDriverApi'] < 13000
-            or support.get('cudaComputeCapabilities') != [[8, 9]]
-            or not isinstance(support.get('validatedGpuNames'), list)
-            or support.get('validationScope') != 'private-RTX4090-candidate'):
+            or not isinstance(support.get('validatedGpuNames'), list)):
+        fail()
+    legacy = (support.get('cudaComputeCapabilities') == [[8, 9]]
+              and support.get('validationScope') == 'private-RTX4090-candidate')
+    # This branch is reachable only through a newly content-pinned app catalog.
+    # An edited external receipt cannot broaden the legacy SM89 artifact.
+    provenance = admitted.get('nativeProvenance') or {}
+    if not isinstance(provenance, dict):
+        fail()
+    sm86 = (admitted['runtimeId'] == 'qwen-cuda'
+            and support.get('cudaComputeCapabilities') == [[8, 6], [8, 9]]
+            and support.get('validationScope') == 'qwen-sm86-build-candidate'
+            and support['validatedGpuNames'] == []
+            and provenance.get('kind') == 'qwen-sm86-source-build'
+            and provenance.get('cudaArchitectures') == [86, 89]
+            and provenance.get('sourceCommit') == '6fae92914045cd83364d2845ceaa0f7969727319'
+            and provenance.get('ggmlCommit') == '40e16e4a814f7fe851a0c486fb9e8c722e957830'
+            and provenance.get('cudaVersion') == '13.0'
+            and provenance.get('gpuInferenceValidated') is False)
+    if not (legacy or sm86):
         fail()
     try:
         driver_path = ordinary(system_directory() / 'nvcuda.dll')

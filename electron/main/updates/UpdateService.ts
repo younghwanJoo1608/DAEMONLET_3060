@@ -1,3 +1,4 @@
+import { UPDATES_ENABLED } from "../../shared/app-identity.mjs"
 import { valid, prerelease, gt } from "semver"
 import { randomUUID } from "node:crypto"
 import { readFile, writeFile, mkdir } from "node:fs/promises"
@@ -28,6 +29,7 @@ export class UpdateService {
   private installAttempt: InstallAttempt | null = null
   private readonly recovery: UpdateRecoveryStore
   constructor(private readonly options: {
+    updatesEnabled?: boolean;
     version: string; platform: () => Promise<UpdatePlatform>; engine: () => UpdateEngine; dataRoot: string;
     setUnsignedWindowsPolicy?: (enabled: boolean) => Promise<boolean>;
     autoCheck: () => boolean; confirmInstall: () => Promise<boolean>;
@@ -35,13 +37,15 @@ export class UpdateService {
     openExternal: (url: string) => Promise<void>;
     fetchLatest?: (etag?: string) => Promise<{ status: number; etag?: string; tag?: string }>;
     now?: () => number;
-  }) { this.state = { phase: "idle", currentVersion: options.version }; this.recovery = new UpdateRecoveryStore(options.dataRoot) }
+  }) { this.state = { phase: this.enabled ? "idle" : "blocked", reason: this.enabled ? undefined : "FORK_UPDATES_DISABLED", currentVersion: options.version }; this.recovery = new UpdateRecoveryStore(options.dataRoot) }
+  private get enabled() { return this.options.updatesEnabled ?? UPDATES_ENABLED }
   private engine: UpdateEngine | null = null
   snapshot(): UpdateSnapshot { return structuredClone(this.state) }
   subscribe(listener: (value: UpdateSnapshot) => void) { this.listeners.add(listener); return () => { this.listeners.delete(listener) } }
   private publish(patch: Partial<UpdateSnapshot>) { this.state = { ...this.state, ...patch }; for (const listener of this.listeners) listener(this.snapshot()) }
   private now() { return this.options.now?.() ?? Date.now() }
   async start() {
+    if (!this.enabled) return false
     const previous = await this.recovery.read(this.options.version)
     if (this.disposed) return false
     this.recoveryPending = Boolean(previous)
@@ -58,6 +62,10 @@ export class UpdateService {
   }
   async act(action: UpdateAction): Promise<UpdateSnapshot> {
     if (this.disposed || this.policyBusy) return this.snapshot()
+    if (!this.enabled) {
+      if (action.action === "openRelease") await this.options.openExternal(RELEASE_ROOT + "/latest")
+      return this.snapshot()
+    }
     if (action.action === "setUnsignedWindowsPolicy") {
       if (["preparing", "handoff"].includes(this.state.phase) || !this.options.setUnsignedWindowsPolicy) return this.snapshot()
       this.policyBusy = true
@@ -74,6 +82,7 @@ export class UpdateService {
     return this.snapshot()
   }
   async check(automatic: boolean): Promise<void> {
+    if (!this.enabled) return
     if (this.disposed || this.download || ["checking", "downloading", "downloaded", "preparing", "handoff"].includes(this.state.phase)) return
     if (automatic && (this.backgroundStopped || this.recoveryPending || !this.options.autoCheck() || this.now() < this.nextAuto)) return
     if (!automatic && this.now() - this.lastManual < 10_000) return

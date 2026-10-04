@@ -268,7 +268,7 @@ export class AppController {
       store:new BelleCredentialStore(join(app.isPackaged?process.resourcesPath:dirname,process.platform==='win32'?'native/DaemonletBelleCredential.exe':'native/DaemonletBelleCredential')),
       metadata:new BelleConnectionMetadata(app.getPath('userData')),
       runtime:new BelleTunnelRuntime(join(app.isPackaged?process.resourcesPath:dirname,'dot/dot-presentation-mcp.mjs'),process.platform,undefined,undefined,dotsDiagnostic),
-      external:process.env.DAEMONLET_DOT_BRIDGE==='1',
+      external:process.env.DAEMONLET_3060_DOT_BRIDGE==='1',
       bridge:{start:async signal=>{
         if(this.quitting||this.updatePreparing)throw Error('SHUTTING_DOWN')
         const token=randomBytes(32).toString('hex'),port=await this.startDotBridge({token,port:0})
@@ -888,7 +888,7 @@ export class AppController {
 
   private async stopDotBridge(){
     // A settings manager must never tear down the independently launched legacy helper.
-    if(process.env.DAEMONLET_DOT_BRIDGE==='1'&&!this.quitting)return
+    if(process.env.DAEMONLET_3060_DOT_BRIDGE==='1'&&!this.quitting)return
     for(const off of this.dotSubscriptions.splice(0))off()
     try{
       await this.dotServer?.close();this.dotServer=null
@@ -1377,7 +1377,7 @@ export class AppController {
     const result = {
       packUpdateValidation,
       appReady: app.isReady(),
-      customProtocolHandled: win?.webContents.getURL().startsWith(this.devServerUrl ? "http://127.0.0.1:4173/" : "pet://app/") ?? false,
+      customProtocolHandled: win?.webContents.getURL().startsWith(this.devServerUrl ? this.devServerUrl.replace(/\/$/, "") + "/" : "pet://app/") ?? false,
       petWindowCreated: Boolean(win && !win.isDestroyed()),
       secureWebPreferences: win ? (win.webContents as typeof win.webContents & { getLastWebPreferences(): Electron.WebPreferences }).getLastWebPreferences() : null,
       preloadLoaded: true,

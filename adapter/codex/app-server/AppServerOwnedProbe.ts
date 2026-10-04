@@ -35,7 +35,7 @@ export async function runOwnedProbe(codexPath: string, packageVersion: string, t
     spawnSync("git", ["init", "--quiet", workspace], { shell: false })
     const client = await process.start()
     stage = "initialize"
-    await client.initialize({ name: "daemonlet_codex_pet_adapter", title: "Daemonlet for Codex Adapter", version: packageVersion })
+    await client.initialize({ name: "daemonlet_codex_pet_adapter", title: "Daemonlet 3060 Adapter", version: packageVersion })
     const completion = new Promise<void>((resolve, reject) => {
       completionTimer = setTimeout(() => reject(new Error("owned probe turn timed out")), timeoutMs)
       completionTimer.unref()

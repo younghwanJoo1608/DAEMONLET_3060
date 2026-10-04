@@ -99,7 +99,7 @@ export class CodexAdapterService {
       } else {
         this.appServer = new AppServerProcess(this.config.codexPath)
         const client = await this.appServer.start()
-        await client.initialize({ name: "daemonlet_codex_pet_adapter", title: "Daemonlet for Codex Adapter", version: "0.2.0" })
+        await client.initialize({ name: "daemonlet_codex_pet_adapter", title: "Daemonlet 3060 Adapter", version: "0.2.0" })
         this.appServerUnsubscribe = client.onNotification((method, params) => {
           const validated = validateAppServerNotification(method, params)
           if (!validated.ok) return void this.warnings.push(`rejected app-server notification: ${validated.code}`)

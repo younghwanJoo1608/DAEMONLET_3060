@@ -12,7 +12,7 @@ const wait=async(test:()=>boolean|Promise<boolean>,label='UI')=>{for(let i=0;i<2
 /** Isolated user data/ports. Optional owner-selected real Desktop follower never sends or stops a turn. */
 export async function runDotBridgeUiSmoke(pet:BrowserWindow,bubble:ActivityBubbleWindowController,get:()=>DotPresentationService,layout:(value:boolean)=>void,list:ActivityWindowController,control:TaskControlService){
  if(process.env.ELECTRON_SMOKE_TEST!=='1'||!process.env.ELECTRON_SMOKE_USER_DATA||!process.env.ELECTRON_SMOKE_DOT_EVIDENCE)throw Error('DOT_SMOKE_ISOLATION')
- const speech=bubble.speech,checks:Record<string,boolean>={},port=Number(process.env.DAEMONLET_DOT_PORT),token=process.env.DAEMONLET_DOT_TOKEN
+ const speech=bubble.speech,checks:Record<string,boolean>={},port=Number(process.env.DAEMONLET_3060_DOT_PORT),token=process.env.DAEMONLET_3060_DOT_TOKEN
  const dir=process.env.ELECTRON_SMOKE_DOT_EVIDENCE!,geometry:Array<unknown>=[]
  const present=async(command:unknown)=>{const r=await fetch(`http://127.0.0.1:${port}/present`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify(command)});return {status:r.status,value:await r.json()}}
  // Pet readiness can precede the asynchronous server listen callback. Wait for the

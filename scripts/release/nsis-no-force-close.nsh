@@ -4,7 +4,7 @@
   Push $1
   Push $2
   Push $3
-  ReadEnvStr $0 "DAEMONLET_OWNED_UPDATE_PID"
+  ReadEnvStr $0 "DAEMONLET_3060_OWNED_UPDATE_PID"
   ${If} $0 != ""
     System::Call 'kernel32::OpenProcess(i 0x00100000, i 0, i r0) p.r1'
     ${If} $1 != 0

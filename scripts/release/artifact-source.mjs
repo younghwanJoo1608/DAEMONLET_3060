@@ -20,7 +20,7 @@ export async function readAsarIdentity(path) {
       return JSON.parse(extractFile(path, normalize(name), false).toString('utf8'))
     }
     const pkg = json('package.json')
-    if (pkg.name !== 'daemonlet-for-codex') throw Error('Not a Daemonlet app archive')
+    if (pkg.name !== 'daemonlet-3060') throw Error('Not a Daemonlet app archive')
     const desktop = buildIdentity(json('dist-electron/build-source.json'), pkg.version)
     const renderer = buildIdentity(json('dist/build-source.json'), pkg.version)
     assertSameSource(desktop.source, renderer.source)

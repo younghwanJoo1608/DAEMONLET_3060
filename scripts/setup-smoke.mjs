@@ -42,16 +42,16 @@ await runNode(join(project, "node_modules/@electron-forge/cli", forgeBin), ["pac
 const root = await realpath(await mkdtemp("/private/tmp/daemonlet-setup-smoke-"))
 const home = join(root, "codex-home"), userData = join(root, "userData"), dataDir = join(root, "adapter-data"), standalone = join(root, "standalone")
 await Promise.all([home, userData, dataDir, standalone, join(root, "bin")].map((path) => mkdir(path, { mode: 0o700 })))
-const sourceBundle = join(project, `out/Daemonlet for Codex-darwin-${process.arch}/Daemonlet for Codex.app`)
+const sourceBundle = join(project, `out/Daemonlet 3060-darwin-${process.arch}/Daemonlet 3060.app`)
 const bundle = join(standalone, "Pet 한글 ' $() `literal`.app")
 // Preserve relative framework symlinks. Resolving them into the build tree
 // would make a copied package appear independent while still using that tree.
 await cp(sourceBundle, bundle, { recursive: true, verbatimSymlinks: true })
-const executable = join(bundle, "Contents/MacOS/Daemonlet for Codex")
+const executable = join(bundle, "Contents/MacOS/Daemonlet 3060")
 const fakeCodex = join(root, "bin/codex")
 await writeFile(fakeCodex, "#!/bin/sh\nif [ \"$1\" = '--version' ]; then printf 'codex-cli 0.147.0\\n'; elif [ \"$1\" = 'features' ] && [ \"$2\" = 'list' ]; then printf 'hooks stable true\\n'; else exit 1; fi\n", { mode: 0o700 })
 await writeFile(join(home, "config.toml"), "# isolated setup smoke\n[features]\nhooks = true\n", { mode: 0o600 })
-await writeFile(join(home, "hooks.json"), JSON.stringify({ description: "PRIVATE_DESCRIPTION_CANARY", hooks: { Stop: [{ description: "PRIVATE_GROUP_CANARY", hooks: [{ type: "command", command: "PRIVATE_FOREIGN_A_CANARY" }, { type: "command", command: "PRIVATE_FOREIGN_B_CANARY", statusMessage: "daemonlet-codex-pet-adapter" }] }] }, metadata: { preserved: true } }), { mode: 0o600 })
+await writeFile(join(home, "hooks.json"), JSON.stringify({ description: "PRIVATE_DESCRIPTION_CANARY", hooks: { Stop: [{ description: "PRIVATE_GROUP_CANARY", hooks: [{ type: "command", command: "PRIVATE_FOREIGN_A_CANARY" }, { type: "command", command: "PRIVATE_FOREIGN_B_CANARY", statusMessage: "daemonlet-3060-codex-pet-adapter" }] }] }, metadata: { preserved: true } }), { mode: 0o600 })
 const protocolPort = await freePort()
 let hookPort
 do { hookPort = await freePort() } while (hookPort === protocolPort)
@@ -62,8 +62,8 @@ const rawLogs = []
 const phase = async (pass) => {
   const child = spawn(executable, [], { cwd: standalone, detached: true, stdio: ["ignore", "pipe", "pipe"], env: {
     PATH: HOOK_SYSTEM_PATH, ELECTRON_SMOKE_USER_DATA: userData, ELECTRON_SMOKE_ADAPTER_MODE: "owned",
-    CODEX_HOME: home, CODEX_PATH: fakeCodex, CODEX_PET_DATA_DIR: dataDir,
-    CODEX_PET_PROTOCOL_PORT: String(protocolPort), CODEX_PET_HOOK_PORT: String(hookPort),
+    CODEX_HOME: home, CODEX_PATH: fakeCodex, DAEMONLET_3060_ADAPTER_DATA_DIR: dataDir,
+    DAEMONLET_3060_PROTOCOL_PORT: String(protocolPort), DAEMONLET_3060_HOOK_PORT: String(hookPort),
     SETUP_SMOKE_ROOT: root, SETUP_SMOKE_EVIDENCE_DIR: join(evidence, "screenshots"), SETUP_SMOKE_PASS: pass,
     SETUP_SMOKE_LEGACY_NODE_PATH: process.execPath,
   } })

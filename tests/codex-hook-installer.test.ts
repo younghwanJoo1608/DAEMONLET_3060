@@ -25,12 +25,12 @@ describe.runIf(process.platform !== "win32")("[POSIX filesystem] HookInstaller",
     expect(file.hooks.Stop[0].description).toBe("existing")
     expect(JSON.stringify(file)).toContain("'/node with spaces/node'")
     expect(JSON.stringify(file)).toContain("commandWindows")
-    for (const event of INSTALLED_HOOK_EVENTS) expect(file.hooks[event].filter((entry: unknown) => JSON.stringify(entry).includes("daemonlet-codex-pet-adapter"))).toHaveLength(1)
+    for (const event of INSTALLED_HOOK_EVENTS) expect(file.hooks[event].filter((entry: unknown) => JSON.stringify(entry).includes("daemonlet-3060-codex-pet-adapter"))).toHaveLength(1)
     expect((await manageHooks({ ...options, action: "apply" })).changed).toBe(false)
     await manageHooks({ ...options, action: "uninstall" })
     const uninstalled = JSON.parse(await readFile(join(codexHome, "hooks.json"), "utf8"))
     expect(uninstalled.hooks.Stop).toHaveLength(1)
-    expect(JSON.stringify(uninstalled)).not.toContain("daemonlet-codex-pet-adapter")
+    expect(JSON.stringify(uninstalled)).not.toContain("daemonlet-3060-codex-pet-adapter")
   })
 
   it("aborts on invalid existing JSON", async () => {

@@ -45,7 +45,7 @@ await checkExternalNotices(join(resources, 'licenses'))
 const chromiumNotice = join(appDirectory, 'LICENSES.chromium.html')
 await stat(chromiumNotice)
 const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'))
-const label = `Daemonlet-for-Codex-${pkg.version}-windows-${values.arch}`
+const label = `Daemonlet-3060-${pkg.version}-windows-${values.arch}`
 const stage = join(output, 'bundle', label)
 await mkdir(stage, { recursive: true })
 await cp(app, join(stage, name), { recursive: true })

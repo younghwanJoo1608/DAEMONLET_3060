@@ -1,3 +1,20 @@
+# Daemonlet 3060
+
+RTX 3060 Ti (SM86)용 Qwen GGUF 실행 경로를 포함하는 **비공식 Daemonlet 포크**입니다.
+원본 [ddol2ya/DAEMONLET](https://github.com/ddol2ya/DAEMONLET)의 라이선스, 저작권,
+캐릭터 아트와 출처 표기를 유지합니다. 원본 프로젝트나 OpenAI의 공식 배포가 아닙니다.
+
+이 포크는 별도 앱 ID와 프로필을 사용하며 기존 Daemonlet의 설정·모델·자격증명을 자동으로
+옮기지 않습니다. 앱 내 업데이트는 꺼져 있습니다. [포크 저장소](https://github.com/younghwanJoo1608/DAEMONLET_3060)와
+[격리 및 패키징 안내](docs/daemonlet-3060-identity.md)를 확인하세요.
+로컬 Windows 설치 패키지의 정적 무결성 검증과 격리 ICL 재생 검증을 통과했습니다.
+사용자가 설치 후 음성 출력을 확인했습니다. 공개 릴리스·전체 설치/제거 회귀 검증은 별도입니다.
+
+아래는 보존된 **원본 프로젝트 안내**입니다. 아래의 원본 다운로드와 검증 이력은
+Daemonlet 3060 배포나 호환성 검증을 의미하지 않습니다.
+
+---
+
 # Daemonlet for Codex
 
 **한국어** · [English](README.en.md)

@@ -16,7 +16,7 @@ export type DoctorReport = {
   codex: { path: string | null; version: string | null; appServer: boolean; schemaGeneration: boolean; schemaHash: string | null }
   hooks: { featureEnabled: boolean | null; fileValid: boolean; installed: boolean; trusted: null; note: string }
   permissions: { dataDirectory: string; dataDirectoryMode: string | null; tokenMode: string | null; warnings: string[] }
-  ports: { protocol4174: "available" | "listening" | "unknown"; hook4175: "available" | "listening" | "unknown" }
+  ports: { protocol4674: "available" | "listening" | "unknown"; hook4675: "available" | "listening" | "unknown" }
   attach: Awaited<ReturnType<typeof inspectAttachFeasibility>> | null
   warnings: string[]
 }
@@ -95,14 +95,14 @@ export async function runDoctor(options: { codexPath?: string; codexHome: string
   const permissionWarnings: string[] = []
   if (process.platform !== "win32" && dataMode && dataMode !== "700") permissionWarnings.push(`data directory mode is ${dataMode}; expected 700`)
   if (process.platform !== "win32" && tokenMode && tokenMode !== "600") permissionWarnings.push(`token mode is ${tokenMode}; expected 600`)
-  const [protocol4174, hook4175] = await Promise.all([portState(4174), portState(4175)])
+  const [protocol4674, hook4675] = await Promise.all([portState(4674), portState(4675)])
 
   return {
     checkedAt: Date.now(),
     codex: { path: codexPath, version, appServer, schemaGeneration, schemaHash },
     hooks: { featureEnabled, fileValid: hooksFileValid, installed, trusted: null, note: "Trust must be reviewed in Codex /hooks; it is not inferred from local files" },
     permissions: { dataDirectory: options.dataDir, dataDirectoryMode: dataMode, tokenMode, warnings: permissionWarnings },
-    ports: { protocol4174, hook4175 },
+    ports: { protocol4674, hook4675 },
     attach,
     warnings,
   }

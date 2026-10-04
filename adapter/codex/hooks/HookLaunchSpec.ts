@@ -4,7 +4,7 @@ import { createHash } from "node:crypto"
 import { dirname, join, posix, win32, sep } from "node:path"
 import { getCurrentFuseWire, FuseV1Options, FuseState } from "@electron/fuses"
 
-export const HOOK_MARKER = "daemonlet-codex-pet-adapter"
+export const HOOK_MARKER = "daemonlet-3060-codex-pet-adapter"
 export const HOOK_ARGUMENT = `--${HOOK_MARKER}=1`
 export const HOOK_SYSTEM_PATH = "/usr/bin:/bin:/usr/sbin:/sbin"
 // Gate 0 measured a fresh unsigned macOS launch at 1.37 s (repeats 83 ms).
@@ -128,7 +128,7 @@ export function windowsHookArguments(spec: HookLaunchSpec): string[] {
   const encode = (value: string) => Array.from({ length: value.length }, (_, i) => value.charCodeAt(i).toString(16).padStart(4, "0")).join("")
   return [encode(spec.dataDir), encode(spec.hookEndpoint), HOOK_ARGUMENT]
 }
-export function windowsElectronPath(spec: HookLaunchSpec): string { return win32.join(win32.dirname(win32.dirname(win32.dirname(spec.executablePath))), "Daemonlet for Codex.exe") }
+export function windowsElectronPath(spec: HookLaunchSpec): string { return win32.join(win32.dirname(win32.dirname(win32.dirname(spec.executablePath))), "Daemonlet 3060.exe") }
 
 export function legacyHookCommands(executablePath: string, forwarderPath: string): { command: string; commandWindows: string } {
   const quoteWindows = (value: string) => `"${value.replaceAll('"', '\\"')}"`

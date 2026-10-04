@@ -16,7 +16,7 @@ pre { margin: 10px 0; white-space: pre-wrap; overflow-wrap: anywhere; padding: 1
 .settings-shell { display: grid; grid-template-columns: 204px minmax(0, 1fr); min-height: 100vh; }
 .settings-sidebar { position: sticky; top: 0; height: 100vh; padding: 32px 18px 24px; background: #eff1eb; border-right: 1px solid #e2e5dc; display: flex; flex-direction: column; }
 .brand { display: flex; align-items: center; gap: 10px; padding: 0 10px; color: #2a4137; font-size: 19px; font-weight: 650; letter-spacing: -.02em; }
-.brand-mark { width: 35px; height: 35px; display: grid; place-items: center; font-size: 13px; background: #2e5545; color: #f6f5ee; border-radius: 11px 11px 11px 3px; letter-spacing: -.05em; }
+.brand-mark { width: 35px; height: 35px; flex-shrink: 0; display: grid; place-items: center; font-size: 13px; background: #2e5545; color: #f6f5ee; border-radius: 11px 11px 11px 3px; letter-spacing: -.05em; }
 .brand small { display: block; color: #697568; font-size: 10px; font-weight: 400; letter-spacing: 0; margin-top: 1px; }
 .settings-nav { display: grid; gap: 7px; margin-top: 44px; }
 .settings-nav button { display: flex; align-items: center; gap: 12px; padding: 11px 15px; border: 1px solid transparent; border-radius: 9px; text-align: left; font-weight: 530; color: #667366; background: transparent; }

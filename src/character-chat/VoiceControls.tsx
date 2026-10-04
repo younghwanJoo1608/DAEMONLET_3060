@@ -175,9 +175,10 @@ Object.assign(errors,{
  GGUF_RUNTIME_TERMS_OPEN_FAILED:'이용 조건 문서를 열지 못했습니다. 텍스트 보기로 확인해 주세요.',
  GGUF_RUNTIME_ADMISSION:'관리형 GGUF 실행 환경을 확인하지 못했습니다. 복구와 전체 검사를 실행해 주세요.',
  GGUF_MANAGED_RUNTIME_CHANGED:'GGUF 실행 환경 파일이 없거나 검사에 실패했습니다. 실행 환경 복구를 눌러 주세요.',
- GGUF_MANAGED_GPU_UNSUPPORTED:'현재 GGUF CUDA 빌드는 compute capability 8.9 GPU가 필요합니다. RTX 4090에서 검증했습니다.',
+ GGUF_MANAGED_GPU_UNSUPPORTED:'선택한 GGUF CUDA 실행 환경에서 지원하지 않는 GPU입니다. 엔진별 지원 장치를 확인해 주세요.',
  GGUF_MANAGED_DRIVER_UNSUPPORTED:'현재 GGUF CUDA 빌드는 CUDA 13을 지원하는 R580 이상 NVIDIA 드라이버가 필요합니다. GPU 드라이버를 확인해 주세요.'
 })
+const qwenCudaSupport='Qwen CUDA는 compute capability 8.6 또는 8.9와 R580 이상 NVIDIA 드라이버가 필요합니다. RTX 3060 Ti 8GB에서 음성 생성 시험을 통과했습니다. 앱 전체 검증은 진행 중입니다.'
 function VoiceFilesPreparation({state,busy,act,trained}:{state:VoiceSnapshot;busy:boolean;act:(value:VoiceAction)=>unknown;trained:boolean}){
  const t=useT(),id:GgufRuntimeId|undefined=state.engine==='qwen3-tts-06b-gguf'?state.executionProfile?.includes('vulkan')?'qwen-vulkan':'qwen-cuda':isWindowsVoxGgufProfile(state.executionProfile)?state.executionProfile?.includes('vulkan')?'vox-vulkan':'vox-cuda':undefined
  if(!id)return null
@@ -185,7 +186,7 @@ function VoiceFilesPreparation({state,busy,act,trained}:{state:VoiceSnapshot;bus
  return <div className="voice-files-preparation">
   <strong>{t('모델과 실행 환경을 함께 준비')}</strong>
   <p>{t('필요한 파일을 받고 검사한 뒤 현재 엔진에 연결합니다. 목소리 선택과 시험 재생은 다음 단계입니다.')}</p>
-  <small>{t(id.endsWith('cuda')?'지원 장치: RTX 4090에서 검증 · NVIDIA compute capability 8.9, R580 이상 드라이버 필요':'지원 장치: Vulkan · RTX 4090에서 검증, AMD·Intel은 검증 전')}</small>
+  <small>{t(id==='qwen-cuda'?qwenCudaSupport:id.endsWith('cuda')?'지원 장치: RTX 4090에서 검증 · NVIDIA compute capability 8.9, R580 이상 드라이버 필요':'지원 장치: Vulkan · RTX 4090에서 검증, AMD·Intel은 검증 전')}</small>
   <small>{t('새 설치 기준 다운로드')}: {((id.startsWith('qwen')?1283766112:5073076896)/1e9).toFixed(2)} GB {t('모델')} + {((runtime?.total??0)/1e9).toFixed(2)} GB {t('실행 환경')}</small>
   <small>{t('모델 배포자')}: {id.startsWith('qwen')?'Serveurperso':'DennisHuang648'} · {t('커뮤니티 변환')} · Apache-2.0</small>
   {state.ggufRuntimeTerms&&<ManagedRuntimeTerms state={state.ggufRuntimeTerms} busy={busy} act={act}/>}
@@ -203,7 +204,7 @@ function GgufRuntimeSetup({state,busy,act}:{state:VoiceSnapshot;busy:boolean;act
  if(!id)return null
  const runtime=state.ggufRuntimeInstall?.find(s=>s.id===id),setup=state.ggufRuntimeSetup,owns=setup?.id===id,active=!!runtime&&runtime.phase!=='idle'||owns&&(!!setup.busy||!!setup.cancelling),canPrepare=!!runtime?.supported&&runtime.available
  const error=runtime?.error||(owns?setup?.error:undefined)||(!runtime?setup?.error:undefined)||(!runtime?.available?runtime?.blockedReason:undefined)
- return <details className="voice-runtime-details" open={active}><summary>{t('실행 환경 상태·복구')}</summary><div className="voice-install voice-gguf-runtime"><strong>{id.startsWith('qwen')?'Qwen GGUF':'VoxCPM2 GGUF'} · {id.endsWith('cuda')?'CUDA':'Vulkan'}</strong><p>{t('GGUF 실행 환경 준비')}</p><small>{t('Python과 필요한 실행 파일을 자동으로 준비합니다. CUDA SDK나 새 GPU 드라이버를 설치하지 않습니다.')}</small><small>{t(id.endsWith('cuda')?'CUDA 빌드는 compute capability 8.9와 R580 이상 NVIDIA 드라이버가 필요합니다. RTX 4090에서 검증했습니다.':'Vulkan 경로는 RTX 4090에서 검증했습니다. AMD·Intel GPU는 아직 검증하지 않았습니다.')}</small>{runtime&&<small>{t('실행 환경 다운로드')}: {(runtime.total/1e9).toFixed(2)} GB</small>}
+ return <details className="voice-runtime-details" open={active}><summary>{t('실행 환경 상태·복구')}</summary><div className="voice-install voice-gguf-runtime"><strong>{id.startsWith('qwen')?'Qwen GGUF':'VoxCPM2 GGUF'} · {id.endsWith('cuda')?'CUDA':'Vulkan'}</strong><p>{t('GGUF 실행 환경 준비')}</p><small>{t('Python과 필요한 실행 파일을 자동으로 준비합니다. CUDA SDK나 새 GPU 드라이버를 설치하지 않습니다.')}</small><small>{t(id==='qwen-cuda'?qwenCudaSupport:id.endsWith('cuda')?'CUDA 빌드는 compute capability 8.9와 R580 이상 NVIDIA 드라이버가 필요합니다. RTX 4090에서 검증했습니다.':'Vulkan 경로는 RTX 4090에서 검증했습니다. AMD·Intel GPU는 아직 검증하지 않았습니다.')}</small>{runtime&&<small>{t('실행 환경 다운로드')}: {(runtime.total/1e9).toFixed(2)} GB</small>}
  {active?<><span role="status">{t(setup?.cancelling?'실행 환경 중단 확인 중':runtime?.phase==='downloading'?'실행 환경 다운로드 중':runtime?.phase==='extracting'?'실행 환경 압축 해제 중':runtime?.phase==='verifying'?'실행 환경 전체 검사 중':'실행 환경 준비 중')}</span><progress aria-label={t('GGUF 실행 환경 진행률')} {...(runtime?.phase==='downloading'?{value:runtime.bytes,max:runtime.total}:{})}/><button disabled={!!setup?.cancelling} onClick={()=>void act({type:state.filePreparation?.busy?'cancelPrepareVoiceFiles':'cancelInstallGgufRuntime'})}>{t('실행 환경 작업 중단')}</button></>:<div className="button-row"><button disabled={busy||!canPrepare||!!state.ggufRuntimeTerms&&!state.ggufRuntimeTerms.accepted} onClick={()=>void act({type:'installGgufRuntime',id})}>{t(runtime?.installed?'검사한 실행 환경 연결':'실행 환경 자동 준비')}</button><button disabled={busy||!canPrepare||runtime?.repairAvailable===false||!!state.ggufRuntimeTerms&&!state.ggufRuntimeTerms.accepted} onClick={()=>void act({type:'repairGgufRuntime',id})}>{t('실행 환경 복구')}</button><button disabled={busy||!runtime?.supported||!runtime.installed||!!state.ggufRuntimeTerms&&!state.ggufRuntimeTerms.accepted} onClick={()=>void act({type:'verifyGgufRuntime',id})}>{t('실행 환경 전체 검사')}</button></div>}
  {runtime?.verified&&<small role="status">{t('실행 환경 파일 검사 완료 · GPU 발화 준비는 별도입니다.')}</small>}
  {owns&&setup.application==='connected'&&<small role="status">{t('현재 엔진·재생 방식의 실행 환경과 모델을 연결했습니다. 음성 사용을 켜고 미리 준비하거나 시험 재생하세요.')}</small>}

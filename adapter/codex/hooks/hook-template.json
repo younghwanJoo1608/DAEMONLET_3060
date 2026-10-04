@@ -1,5 +1,5 @@
 {
-  "description": "daemonlet-codex-pet-adapter",
+  "description": "daemonlet-3060-codex-pet-adapter",
   "events": [
     "SessionStart",
     "SessionEnd",

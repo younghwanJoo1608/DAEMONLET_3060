@@ -1,15 +1,15 @@
 {
-  "name": "daemonlet-for-codex",
+  "name": "daemonlet-3060",
   "version": "0.8.4",
   "private": true,
   "type": "module",
   "main": "dist-electron/main.cjs",
-  "productName": "Daemonlet for Codex",
+  "productName": "Daemonlet 3060",
   "engines": {
     "node": ">=22.13.0"
   },
   "scripts": {
-    "dev": "vite --port 4173 --strictPort",
+    "dev": "vite --port 4673 --strictPort",
     "build": "npm run build:renderer",
     "build:renderer": "node scripts/build-renderer.mjs",
     "build:electron": "node electron/build/build-electron.mjs",
@@ -23,7 +23,7 @@
     "macos:archive": "node scripts/macos.mjs archive",
     "setup:smoke": "node --experimental-strip-types scripts/setup-smoke.mjs",
     "setup:host-proof": "node --experimental-strip-types scripts/hook-host-proof.ts",
-    "preview": "vite preview --port 4173 --strictPort",
+    "preview": "vite preview --port 4673 --strictPort",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -89,13 +89,13 @@
     "ws": "^8.21.3"
   },
   "license": "MIT",
-  "description": "A desktop character companion for Codex",
+  "description": "Unofficial Daemonlet fork with RTX 3060 Ti (SM86) Qwen GGUF support",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ddol2ya/DAEMONLET.git"
+    "url": "https://github.com/younghwanJoo1608/DAEMONLET_3060.git"
   },
-  "homepage": "https://github.com/ddol2ya/DAEMONLET",
+  "homepage": "https://github.com/younghwanJoo1608/DAEMONLET_3060",
   "bugs": {
-    "url": "https://github.com/ddol2ya/DAEMONLET/issues"
+    "url": "https://github.com/younghwanJoo1608/DAEMONLET_3060/issues"
   }
 }

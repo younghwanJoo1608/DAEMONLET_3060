@@ -38,14 +38,14 @@ export async function manageHooks(options: {
   const spec: HookLaunchSpec = {
     mode: "development-node", executablePath: options.nodePath ?? process.execPath,
     forwarderPath: resolve(options.projectRoot, "adapter/codex/hooks/hook-forwarder.mjs"),
-    dataDir: resolve(process.env.CODEX_PET_DATA_DIR ?? join(homedir(), ".codex-pet")),
-    hookEndpoint: process.env.CODEX_PET_HOOK_URL ?? "http://127.0.0.1:4175/hook",
+    dataDir: resolve(process.env.CODEX_PET_DATA_DIR ?? join(homedir(), ".daemonlet-3060")),
+    hookEndpoint: process.env.CODEX_PET_HOOK_URL ?? "http://127.0.0.1:4675/hook",
   }
   // Preserve the historical development command and Windows override. This is
   // never presented as successful packaged installation in the Settings UI.
   const desiredHandler = hookHandler(spec, true)
   const support = allEventSupport("supported")
-  const storageRoot = join(codexHome, ".daemonlet-hook-installer")
+  const storageRoot = join(codexHome, ".daemonlet-3060-hook-installer")
   const installer = new HookInstallTransaction({
     codexHome, storageRoot, context: { desiredHandler }, support,
     now: options.now ? () => options.now!().getTime() : undefined,

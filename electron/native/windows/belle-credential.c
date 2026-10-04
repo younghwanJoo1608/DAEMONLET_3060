@@ -5,9 +5,9 @@
 #include <string.h>
 // Fixed app-owned target. QA builds cannot access the production item.
 #ifdef DAEMONLET_CREDENTIAL_QA
-static wchar_t target[] = L"io.github.ddol2ya.daemonlet.belle-connection.qa-v1";
+static wchar_t target[] = L"io.github.younghwanjoo1608.daemonlet3060.belle-connection.qa-v1";
 #else
-static wchar_t target[] = L"io.github.ddol2ya.daemonlet.belle-connection.runtime-v1";
+static wchar_t target[] = L"io.github.younghwanjoo1608.daemonlet3060.belle-connection.runtime-v1";
 #endif
 static int fail(DWORD code) {
  const char *value = code == ERROR_NOT_FOUND ? "KEY_MISSING" : code == ERROR_ACCESS_DENIED ? "STORE_DENIED" : code == ERROR_NO_SUCH_LOGON_SESSION ? "STORE_LOCKED" : "STORE_UNAVAILABLE";
@@ -33,7 +33,7 @@ int main(int argc,char **argv) {
   CREDENTIALW item={0};item.Type=CRED_TYPE_GENERIC;item.TargetName=target;
   item.CredentialBlob=input+8;item.CredentialBlobSize=(DWORD)n-10;
   item.Persist=CRED_PERSIST_LOCAL_MACHINE;item.UserName=L"runtime-v1";
-  item.Comment=L"DAEMONLET Belle restricted tunnel runtime key";
+  item.Comment=L"Daemonlet 3060 Belle restricted tunnel runtime key";
   BOOL ok=CredWriteW(&item,0);DWORD error=ok?0:GetLastError();SecureZeroMemory(input,sizeof(input));
   if(!ok)return fail(error);printf("{\"ok\":true}");return 0;
  }

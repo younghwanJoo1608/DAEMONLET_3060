@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto"
 import { WebSocketServer } from "ws"
 
 const host = process.env.PROTOCOL_MOCK_HOST || "127.0.0.1"
-const port = Number(process.env.PROTOCOL_MOCK_PORT || 4174)
+const port = Number(process.env.PROTOCOL_MOCK_PORT || 4674)
 if (!Number.isSafeInteger(port) || port < 1 || port > 65535) throw new Error("PROTOCOL_MOCK_PORT must be a valid TCP port")
 if (!["127.0.0.1", "localhost", "::1"].includes(host)) throw new Error("PROTOCOL_MOCK_HOST must be a loopback host")
 

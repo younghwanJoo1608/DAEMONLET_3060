@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "status": "pending-build-and-gpu-validation",
+  "sourceRepository": "https://github.com/ServeurpersoCom/qwentts.cpp",
+  "sourceCommit": "6fae92914045cd83364d2845ceaa0f7969727319",
+  "ggmlRepository": "https://github.com/ServeurpersoCom/ggml",
+  "ggmlCommit": "40e16e4a814f7fe851a0c486fb9e8c722e957830",
+  "cudaVersion": "13.0",
+  "cudaArchitectures": [86, 89],
+  "generator": "Visual Studio 17 2022",
+  "msvcToolset": "14.35.32215",
+  "windowsSdk": "10.0.22621.0",
+  "abiVersion": 5,
+  "nativeFiles": ["ggml-base.dll", "ggml-cpu.dll", "ggml-cuda.dll", "ggml.dll", "qwen.dll"]
+}

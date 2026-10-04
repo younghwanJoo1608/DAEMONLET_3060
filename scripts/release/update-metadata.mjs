@@ -1,3 +1,4 @@
+import { UPDATE_REPOSITORY } from "../../electron/shared/app-identity.mjs"
 // Local metadata only. This module never imports a publisher or uploads artifacts.
 import { createHash } from 'node:crypto'
 import { createReadStream } from 'node:fs'
@@ -19,7 +20,7 @@ export async function createUpdateMetadata({ artifact, output, platform, minimum
   const record = await initializeValidation({ root, artifacts: [{ file, kind: platform === 'darwin' ? 'macosFinalZip' : 'windowsInstallerExe' }], packagingResults: packagingResult ? [resolve(packagingResult)] : [] })
   const version = record.appVersion
   if (!valid(version) || prerelease(version) || record.workingTreeHasChanges) throw Error('Clean stable source identity required; never replace an already released version')
-  const expected = 'Daemonlet-for-Codex-' + version + (platform === 'darwin' ? '-macOS-arm64.zip' : '-windows-x64-Setup.exe')
+  const expected = 'Daemonlet-3060-' + version + (platform === 'darwin' ? '-macOS-arm64.zip' : '-windows-x64-Setup.exe')
   if (file !== expected) throw Error('Unexpected update asset name')
   let publisherVerified = platform === 'darwin'
   if (!review) {
@@ -34,7 +35,7 @@ export async function createUpdateMetadata({ artifact, output, platform, minimum
         const verified = await verifyApp(app, signer, { requireTicket: true })
         if (verified.version !== version) throw Error('Archive version mismatch')
         const config = JSON.parse(await readFile(join(app, 'Contents/Resources/app-update.yml'), 'utf8'))
-        if (config.provider !== 'github' || config.owner !== 'ddol2ya' || config.repo !== 'DAEMONLET') throw Error('Update configuration missing before signing')
+        if (config.provider !== 'github' || config.owner !== UPDATE_REPOSITORY.owner || config.repo !== UPDATE_REPOSITORY.repo) throw Error('Update configuration missing before signing')
       } finally { await rm(temp, { recursive: true, force: true }) }
     } else {
       if (process.platform !== 'win32' || !packagingResult) throw Error('Windows final signature verification requires Windows')

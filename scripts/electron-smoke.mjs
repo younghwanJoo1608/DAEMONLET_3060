@@ -107,10 +107,10 @@ const smokeEnvironment = {
   ...process.env,
   ELECTRON_SMOKE_TEST: "1", ELECTRON_SMOKE_RESULT: resultPath,
   ELECTRON_SMOKE_USER_DATA: smokeUserData, ELECTRON_SMOKE_ADAPTER_MODE: adapterMode,
-  CODEX_PET_DATA_DIR: smokeAdapterData, CODEX_PATH: smokeCodexExecutable, CODEX_HOME: smokeCodexHome,
+  DAEMONLET_3060_ADAPTER_DATA_DIR: smokeAdapterData, CODEX_PATH: smokeCodexExecutable, CODEX_HOME: smokeCodexHome,
   ...(recoveryLifecycle ? { CODEX_PET_RECOVERY_TTL_MS: "10000" } : {}),
-  ...(protocolPort ? { CODEX_PET_PROTOCOL_PORT: String(protocolPort) } : {}),
-  ...(hookPort ? { CODEX_PET_HOOK_PORT: String(hookPort) } : {}),
+  ...(protocolPort ? { DAEMONLET_3060_PROTOCOL_PORT: String(protocolPort) } : {}),
+  ...(hookPort ? { DAEMONLET_3060_HOOK_PORT: String(hookPort) } : {}),
 }
 
 // An empty temporary home has no desktop broker. Keep source presence alive

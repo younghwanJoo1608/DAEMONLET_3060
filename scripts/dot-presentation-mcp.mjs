@@ -51,7 +51,7 @@ export function createMcpHandler(forward){
  }
 }
 export function localForward(env=process.env){
- const port=Number(env.DAEMONLET_DOT_PORT??39471),token=env.DAEMONLET_DOT_TOKEN??''
+ const port=Number(env.DAEMONLET_3060_DOT_PORT??39531),token=env.DAEMONLET_3060_DOT_TOKEN??''
  if(!Number.isInteger(port)||port<1024||port>65535||!/^[a-zA-Z0-9_-]{32,128}$/.test(token))throw Error('DOT_CONFIG')
  return async command=>{
   try{const response=await fetch(`http://127.0.0.1:${port}/present`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify(command),signal:AbortSignal.timeout(6000),redirect:'error'});const reader=response.body?.getReader();if(!reader)throw Error('DOT_UNAVAILABLE');let bytes=0;const chunks=[];for(;;){const {value,done}=await reader.read();if(done)break;bytes+=value.byteLength;if(bytes>4096){await reader.cancel();throw Error('DOT_UNAVAILABLE')}chunks.push(Buffer.from(value))}const value=JSON.parse(Buffer.concat(chunks).toString('utf8'));if(!response.ok)throw Error(value.error);if(value.accepted!==true||!Number.isSafeInteger(value.sequence)||typeof value.poseFallback!=='boolean'||!['off','muted','requested'].includes(value.voice))throw Error('DOT_UNAVAILABLE');return {accepted:true,sequence:value.sequence,poseFallback:value.poseFallback,voice:value.voice}}
@@ -73,5 +73,5 @@ export function runStdio(input,output,handler){
  })
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
- try{runStdio(process.stdin,process.stdout,createMcpHandler(localForward()))}catch{process.stderr.write('DOT_CONFIG: supply session DAEMONLET_DOT_TOKEN and optional port.\n');process.exitCode=1}
+ try{runStdio(process.stdin,process.stdout,createMcpHandler(localForward()))}catch{process.stderr.write('DOT_CONFIG: supply session DAEMONLET_3060_DOT_TOKEN and optional port.\n');process.exitCode=1}
 }

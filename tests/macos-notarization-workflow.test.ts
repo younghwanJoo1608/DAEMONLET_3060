@@ -19,7 +19,7 @@ afterEach(async () => { await Promise.all(roots.splice(0).map((root) => rm(root,
 async function fixture(status = "prepared") {
   const root = await realpath(await mkdtemp(join(tmpdir(), "notarization-state-test-")))
   roots.push(root)
-  const app = join(root, "signed/Daemonlet for Codex.app")
+  const app = join(root, "signed/Daemonlet 3060.app")
   await mkdir(app, { recursive: true })
   await mkdir(join(root, "notarization"))
   await mkdir(join(root, "evidence-private"))
@@ -98,7 +98,7 @@ it("cannot declare a final archive verified when fresh extraction verification f
   await writeJSON(join(root, "private-stapled-manifest.json"), manifest)
   mocks.run.mockImplementation(async (_file: string, args: string[]) => {
     if (args.includes("-c")) await writeFile(args.at(-1)!, "archive-fixture")
-    if (args.includes("-x")) await mkdir(join(args.at(-1)!, "Daemonlet for Codex.app"))
+    if (args.includes("-x")) await mkdir(join(args.at(-1)!, "Daemonlet 3060.app"))
     return { code: 0, stdout: "" }
   })
   mocks.verify.mockResolvedValueOnce(manifest).mockRejectedValueOnce(new Error("extracted signature failed"))

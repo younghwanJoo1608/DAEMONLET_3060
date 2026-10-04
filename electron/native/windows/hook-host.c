@@ -35,14 +35,14 @@ static BOOL envEntry(DWORD *offset, const WCHAR *key, const WCHAR *value) {
 }
 static void launch(void) {
   int argc=0; WCHAR **argv=CommandLineToArgvW(GetCommandLineW(), &argc);
-  if (!argv || argc!=4 || lstrcmpW(argv[3], L"--daemonlet-codex-pet-adapter=1") || !decode(argv[1],dataDir,8192) || !decode(argv[2],endpoint,2048)) return;
+  if (!argv || argc!=4 || lstrcmpW(argv[3], L"--daemonlet-3060-codex-pet-adapter=1") || !decode(argv[1],dataDir,8192) || !decode(argv[2],endpoint,2048)) return;
   if (!GetModuleFileNameW(NULL,module,32768) || !parent(module)) return;
   lstrcpyW(forwarder,module); if (!append(forwarder,32768,L"\\hook-forwarder.mjs")) return;
   lstrcpyW(appDir,module); if (!parent(appDir) || !parent(appDir)) return;
-  lstrcpyW(executable,appDir); if (!append(executable,32768,L"\\Daemonlet for Codex.exe") || !ordinary(executable) || !ordinary(forwarder)) return;
+  lstrcpyW(executable,appDir); if (!append(executable,32768,L"\\Daemonlet 3060.exe") || !ordinary(executable) || !ordinary(forwarder)) return;
   if (!GetSystemDirectoryW(systemDir,MAX_PATH) || !GetWindowsDirectoryW(windowsDir,MAX_PATH)) return;
   // Exact fixed paths are quoted; Windows paths cannot contain a quote.
-  if (!append(command,65536,L"\"") || !append(command,65536,executable) || !append(command,65536,L"\" \"") || !append(command,65536,forwarder) || !append(command,65536,L"\" --daemonlet-codex-pet-adapter=1")) return;
+  if (!append(command,65536,L"\"") || !append(command,65536,executable) || !append(command,65536,L"\" \"") || !append(command,65536,forwarder) || !append(command,65536,L"\" --daemonlet-3060-codex-pet-adapter=1")) return;
   DWORD offset=0;
   if (!envEntry(&offset,L"CODEX_PET_DATA_DIR",dataDir) || !envEntry(&offset,L"CODEX_PET_HOOK_TIMEOUT_MS",L"250") || !envEntry(&offset,L"CODEX_PET_HOOK_URL",endpoint) || !envEntry(&offset,L"ELECTRON_RUN_AS_NODE",L"1") || !envEntry(&offset,L"PATH",systemDir) || !envEntry(&offset,L"SystemRoot",windowsDir) || !envEntry(&offset,L"WINDIR",windowsDir)) return;
   SECURITY_ATTRIBUTES sa={sizeof(sa),NULL,TRUE};

@@ -1,3 +1,4 @@
+import { brandText } from "./app-identity.mjs"
 import { languageLocale, type AppLanguage } from "./app-language"
 import englishMessages from "./messages.en.json"
 
@@ -22,7 +23,7 @@ export function createTranslator(language: AppLanguage): Translator {
     const plain = typeof input === "string"
     const stored = plain ? { key: input, values: [] } : Array.isArray(input) ? message(input as unknown as TemplateStringsArray, ...values) : input as AppMessage
     const { key } = stored
-    const translated = language === "en" && Object.hasOwn(ENGLISH_MESSAGES, key) ? ENGLISH_MESSAGES[key] : key
+    const translated = brandText(language === "en" && Object.hasOwn(ENGLISH_MESSAGES, key) ? ENGLISH_MESSAGES[key] : key)
     return plain ? translated : translated.replace(/\{(\d+)\}/g, (match, index: string) => Number(index) < stored.values.length ? String(stored.values[Number(index)]) : match)
   }
   return Object.assign(translate, { language, locale: languageLocale(language) })

@@ -36,9 +36,9 @@ void (async () => {
   }
   const feed = new URL(config.feed)
   if (feed.protocol !== "http:" || feed.hostname !== "127.0.0.1" || !config.profile || !config.output) throw Error("UPDATE_SMOKE_ONLY")
-  process.env.DAEMONLET_DATA_HOME = config.profile
-  process.env.CODEX_PET_PROTOCOL_PORT = String(config.protocolPort)
-  process.env.CODEX_PET_HOOK_PORT = String(config.hookPort)
+  process.env.DAEMONLET_3060_DATA_HOME = config.profile
+  process.env.DAEMONLET_3060_PROTOCOL_PORT = String(config.protocolPort)
+  process.env.DAEMONLET_3060_HOOK_PORT = String(config.hookPort)
   configureDesktopIdentity(app)
   if (!app.requestSingleInstanceLock()) return app.quit()
   app.on("window-all-closed", () => {})
@@ -96,6 +96,7 @@ void (async () => {
   updater.on("error", error => writeFileSync(join(config.output, "engine-error.json"), JSON.stringify({ message: error.message, stack: error.stack })))
   const target = { platform: process.platform, arch: process.arch, osVersion: release(), kind: mac ? "mac" as const : "nsis" as const, automatic: true }
   controller = new AppController(__dirname, characters, undefined, undefined, {
+    updatesEnabled: true, // Excluded QA entry; production stays disabled.
     engine: () => engine, ...(mac || handoffCase ? { platform: async () => target } : {}), fetchLatest: undefined, autoCheck: () => Boolean(handoffCase && recoveryCheck),
     confirmInstall: async () => {
       await writeFile(join(config.output, "test-consent.json"), JSON.stringify({ userAuthorizedIsolatedUpdateTest: true, unsignedWindowsFixtureConsent: config.unsignedWindows === true, productionDialogBypassedOnlyInQa: true }))

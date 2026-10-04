@@ -1,8 +1,23 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { containsHookMarker, createHookCommand, validateLaunchSpec, windowsHookArguments, windowsHookShellPath, type HookLaunchSpec } from "../adapter/codex/hooks/HookLaunchSpec"
 import { allEventSupport, classifyHandler, handlerIdentity, hookHandler, planHookEdit } from "../adapter/codex/hooks/HookInstallPlan"
-const spec: HookLaunchSpec = { mode: "packaged-windows-host", executablePath: "C:\\Test Apps\\한글 & O'Neil\\Daemonlet for Codex\\resources\\codex\\hook-host.exe", forwarderPath: "C:\\Test Apps\\한글 & O'Neil\\Daemonlet for Codex\\resources\\codex\\hook-forwarder.mjs", dataDir: "C:\\Test Data\\한글 & O'Neil\\Daemonlet for Codex\\adapter", hookEndpoint: "discover" }
+const spec: HookLaunchSpec = { mode: "packaged-windows-host", executablePath: "C:\\Test Apps\\한글 & O'Neil\\Daemonlet 3060\\resources\\codex\\hook-host.exe", forwarderPath: "C:\\Test Apps\\한글 & O'Neil\\Daemonlet 3060\\resources\\codex\\hook-forwarder.mjs", dataDir: "C:\\Test Data\\한글 & O'Neil\\Daemonlet 3060\\adapter", hookEndpoint: "discover" }
 describe("packaged Windows Hook launch", () => {
+  it("preserves original Daemonlet hooks during fork install and uninstall", () => {
+    const upstreamInvocation = "& 'C:\\Original\\resources\\codex\\hook-host.exe' aa bb '--daemonlet-codex-pet-adapter=1'"
+    const upstream = { type: "command", command: "powershell.exe -EncodedCommand " + Buffer.from(upstreamInvocation, "utf16le").toString("base64"), timeout: 3 }
+    const group = { description: "daemonlet-codex-pet-adapter", hooks: [upstream] }
+    const before = JSON.stringify({ hooks: { UserPromptSubmit: [group] } })
+    const context = { desiredHandler: hookHandler(spec) }, support = allEventSupport("supported")
+    expect(containsHookMarker(group)).toBe(false)
+    expect(classifyHandler(upstream, group, context)).toBe("foreign")
+    const installed = planHookEdit({ action: "install", before, context, support })
+    expect(installed.conflicts).toEqual([])
+    expect(JSON.parse(installed.after!).hooks.UserPromptSubmit[0]).toEqual(group)
+    const removed = planHookEdit({ action: "uninstall", before: installed.after, context, support })
+    expect(removed.conflicts).toEqual([])
+    expect(JSON.parse(removed.after!).hooks.UserPromptSubmit).toEqual([group])
+  })
   afterEach(() => vi.unstubAllEnvs())
   it("emits one absolute system-shell command usable by CMD and PowerShell", () => {
     const command = createHookCommand(spec), args = windowsHookArguments(spec)
@@ -11,10 +26,10 @@ describe("packaged Windows Hook launch", () => {
     expect(flags.slice(0, 4)).toEqual(["-NoLogo", "-NoProfile", "-NonInteractive", "-EncodedCommand"])
     expect(flags[4]).toMatch(/^[a-zA-Z0-9+/]+=*$/)
     const invocation = Buffer.from(flags[4], "base64").toString("utf16le")
-    expect(invocation.startsWith("& 'C:\\Test Apps\\한글 & O''Neil\\Daemonlet for Codex\\resources\\codex\\hook-host.exe' ")).toBe(true)
+    expect(invocation.startsWith("& 'C:\\Test Apps\\한글 & O''Neil\\Daemonlet 3060\\resources\\codex\\hook-host.exe' ")).toBe(true)
     expect(invocation.endsWith(args.map(value => `'${value}'`).join(" "))).toBe(true)
     expect(command).not.toContain("NODE_OPTIONS")
-    expect(command).not.toMatch(/ExecutionPolicy|Bypass|daemonlet-codex-pet-adapter.*[;&]/i)
+    expect(command).not.toMatch(/ExecutionPolicy|Bypass|daemonlet-3060-codex-pet-adapter.*[;&]/i)
     expect(args[0]).toMatch(/^[a-f0-9]+$/)
     expect(args[0].match(/.{4}/g)?.map(value => String.fromCharCode(parseInt(value, 16))).join("")).toBe(spec.dataDir)
     expect(hookHandler(spec).timeout).toBe(3)

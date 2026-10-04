@@ -1,3 +1,22 @@
+# Daemonlet 3060
+
+An **unofficial Daemonlet fork** with an RTX 3060 Ti (SM86) Qwen GGUF runtime path.
+Upstream [ddol2ya/DAEMONLET](https://github.com/ddol2ya/DAEMONLET) copyright,
+licenses, artwork and attribution are preserved. This is not an official upstream or OpenAI release.
+
+The fork has its own application identity and profile. It does not migrate the original app's
+settings, models or credentials. In-app updates are disabled. See the
+[fork repository](https://github.com/younghwanJoo1608/DAEMONLET_3060) and
+[isolation and packaging notes](docs/daemonlet-3060-identity.md).
+A local Windows installer passed static integrity checks and isolated ICL playback tests.
+The owner reported successful voice output after installation. Public release and complete
+install/uninstall regression acceptance remain separate.
+
+The **upstream documentation** below is retained for reference. Its download links and test
+results describe upstream releases, not Daemonlet 3060 distributions or compatibility results.
+
+---
+
 # Daemonlet for Codex
 
 [한국어](README.md) · **English**

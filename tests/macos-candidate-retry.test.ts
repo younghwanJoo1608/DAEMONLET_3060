@@ -36,7 +36,7 @@ import { createFinalArchive, prepareSubmission, refreshStatus, submitCandidate }
 
 const roots: string[] = []
 const stateName = "private-submission-state.json"
-const appName = "Daemonlet for Codex.app"
+const appName = "Daemonlet 3060.app"
 
 beforeEach(() => { mocks.run.mockReset(); mocks.verify.mockReset(); mocks.failStateWrite = null })
 afterEach(async () => {

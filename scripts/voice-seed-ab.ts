@@ -17,7 +17,7 @@ export async function seedAb(args:string[]){
  const config=JSON.parse(await readFile(resolve(option('config')),'utf8'));if(!['trained','default','wav'].includes(config.kind))throw Error('SEED_KIND')
  const cases=texts.map(text=>({text,plan:planSpeech(text)}))
  if(args.includes('--dry-run')){console.log(JSON.stringify({dryRun:true,kind:config.kind,executionProfile:config.executionProfile,seeds,cases,modelLoaded:false,outputWritten:false},null,2));return}
- const output=resolve(option('output')),repo=await realpath('.'),within=(root:string)=>{const rel=relative(root,output);return !rel||!isAbsolute(rel)&&rel!=='..'&&!rel.startsWith('..'+sep)};if(within(repo)||config.cacheRoot&&within(resolve(config.cacheRoot))||process.env.DAEMONLET_DATA_HOME&&within(resolve(process.env.DAEMONLET_DATA_HOME))||/(?:Application Support|AppData[\\/]Roaming)[\\/]Daemonlet/i.test(output))throw Error('PRIVATE_OUTPUT_REQUIRED')
+ const output=resolve(option('output')),repo=await realpath('.'),within=(root:string)=>{const rel=relative(root,output);return !rel||!isAbsolute(rel)&&rel!=='..'&&!rel.startsWith('..'+sep)};if(within(repo)||config.cacheRoot&&within(resolve(config.cacheRoot))||process.env.DAEMONLET_3060_DATA_HOME&&within(resolve(process.env.DAEMONLET_3060_DATA_HOME))||/(?:Application Support|AppData[\\/]Roaming)[\\/]Daemonlet/i.test(output))throw Error('PRIVATE_OUTPUT_REQUIRED')
  for(const key of ['python','model','worker','cacheRoot'])if(!isAbsolute(config[key]||''))throw Error('SEED_CONFIG')
  await mkdir(output,{recursive:false})
  const report:any={schemaVersion:1,kind:config.kind,executionProfile:config.executionProfile,seeds,cases,review:'PENDING_REVIEW',runs:[],status:'RUNNING',started:new Date().toISOString()}

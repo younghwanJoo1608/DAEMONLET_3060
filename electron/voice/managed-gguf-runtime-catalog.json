@@ -14283,11 +14283,11 @@
     "qwen-cuda": {
       "id": "qwen-cuda",
       "archive": {
-        "name": "qwen-cuda-win32-x64.zip",
-        "bytes": 39000488,
-        "sha256": "f22be49480136a7811729057ff76f53c69fd1c5e9215bc530de85d1915f0906b",
+        "name": "qwen-cuda-sm86-sm89-a223d6db26d1.zip",
         "format": "zip",
-        "bundledPath": "qwen-cuda-win32-x64.zip"
+        "bundledPath": "qwen-cuda-sm86-sm89-a223d6db26d1.zip",
+        "bytes": 74573726,
+        "sha256": "0106862dc48d025855352c8b797c9d1b81471330adf1481eb099fe331daf192a"
       },
       "files": {
         "licenses/qwentts-cpp-MIT.txt": {
@@ -14299,37 +14299,40 @@
           "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
         },
         "native/ggml-base.dll": {
-          "bytes": 655872,
-          "sha256": "f5a881ebd14042ed9f83ef3df12263502ddba9c0aa9ebb8f6ca96d179c5be431"
+          "bytes": 656384,
+          "sha256": "09f8eabd9f22dafc2cb1760f444c61394637cd6ab973b3a10d35d6a3ad9959b0"
         },
         "native/ggml-cpu.dll": {
-          "bytes": 863232,
-          "sha256": "3870cde230d090b845c817d62243153267361c4c6fed61e98e339bb6e2aedf38"
+          "bytes": 865280,
+          "sha256": "5c60f191dd4b0413710f3e0104f1825eed8a5a3e0d566365029629d27ef650a8"
         },
         "native/ggml-cuda.dll": {
-          "bytes": 51713024,
-          "sha256": "caf3f479c5efef5e5f36ea2e1187c1c5be8cc5afaadaa6c8781dd20a4e5b6e25"
+          "bytes": 87540736,
+          "sha256": "a223d6db26d15431335592cb4e9442bafaf07f66d4258c195683723ec8300335"
         },
         "native/ggml.dll": {
           "bytes": 52736,
-          "sha256": "90cb580bac9e57c33398bc4693463f6d1579e741d019181b04384db0501fb142"
+          "sha256": "c15c95ffe23cea1335c14e6c75ab49eca13c34a24cc6d2e3b555166d583eef0a"
         },
         "native/qwen.dll": {
           "bytes": 309760,
-          "sha256": "cc1d71fe19e319d487f1a68f0b25aed62b6db9b619769eb2f33bd98078f09734"
+          "sha256": "65c9e0b7f89182047339687b05ed20ec49e36528fed82fcf35666cdd62799505"
         }
       },
       "provenance": {
-        "kind": "reviewed-existing-native-build",
+        "kind": "qwen-sm86-source-build",
         "sourceCommit": "6fae92914045cd83364d2845ceaa0f7969727319",
+        "ggmlCommit": "40e16e4a814f7fe851a0c486fb9e8c722e957830",
         "sourceLicense": "MIT",
+        "cudaVersion": "13.0",
         "cudaArchitectures": [
+          86,
           89
         ],
-        "testedDevice": "NVIDIA RTX 4090",
-        "testedDriver": "610.47",
+        "gpuInferenceValidated": false,
         "cleanHostVerified": false,
-        "ggmlCommit": "40e16e4a814f7fe851a0c486fb9e8c722e957830"
+        "buildSpecSha256": "630a4a1acd1120ea23d705c990934fdad290f3755c220f1a1d908f0c8a18bab9",
+        "architectureListingSha256": "fcdb90fc998fc424d63c18f1d5c6daf2133722816400999ac6ec6b59da47f96f"
       }
     },
     "qwen-vulkan": {
@@ -14534,15 +14537,17 @@
         "cudaComputeCapabilities": [
           [
             8,
+            6
+          ],
+          [
+            8,
             9
           ]
         ],
         "minimumCudaDriverApi": 13000,
         "minimumDriverBranch": 580,
-        "validatedGpuNames": [
-          "NVIDIA RTX4090"
-        ],
-        "validationScope": "private-RTX4090-candidate"
+        "validatedGpuNames": [],
+        "validationScope": "qwen-sm86-build-candidate"
       }
     },
     "qwen-vulkan": {
